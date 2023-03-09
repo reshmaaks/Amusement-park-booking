@@ -92,17 +92,33 @@ Free Bootstrap 5 HTML Template
                             <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
                                 <li><a class="dropdown-item" href="{% url 'services' %}">Our Services</a></li>
 
-                                <li><a class="dropdown-item" href="{% url 'packages' %}">Packaes</a></li>
+                                <li><a class="dropdown-item" href="{% url 'packages' %}">PACKAGES</a></li>
 
                                 <!-- <li><a class="dropdown-item" href="page-404.html">Page 404</a></li> -->
                             </ul>
-                        </li> 
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'contact' %}">Contact</a>
                         </li>
-                        <li class="nav-item ms-3">
-                            <a class="nav-link custom-btn custom-border-btn custom-btn-bg-white btn" href="#">Get started</a>
+
+                        
+                        {% if request.user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#section_5" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span class="icon-user"></span>&nbsp;{{request.user.username}}</a>
+
+                            <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
+                                <li><a class="dropdown-item" href="{% url 'services' %}">Profile</a></li>
+                                <li><a class="dropdown-item" href="#">Book </a></li>
+                                <li><a class="dropdown-item" href="#">Change Password </a></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
                         </li>
+                        {% else %}
+                        <li class="nav-item ms-3">
+                            <a class="nav-link custom-btn custom-border-btn custom-btn-bg-white btn" href="{% url 'viewlogin' %}">Get started</a>
+                        </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

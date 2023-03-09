@@ -102,9 +102,31 @@ Free Bootstrap 5 HTML Template
                             <a class="nav-link" href="{% url 'contact' %}">Contact</a>
                         </li>
 
-                        <li class="nav-item ms-3">
-                            <a class="nav-link custom-btn custom-border-btn custom-btn-bg-white btn" href="{% url 'login' %}">Get started</a>
+                        
+                        {% if request.user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#section_5" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span class="icon-user"></span>&nbsp;{{request.user.username}}</a>
+
+                            <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
+                                <li><a class="dropdown-item" href="{% url 'services' %}">Profile</a></li>
+
+                                <li><a class="dropdown-item" href="#">Book </a></li>
+                                <li><a class="dropdown-item" href="{% url 'change_password' %}">Change Password </a></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
                         </li>
+                        {% else %}
+                        <li class="nav-item dropdown">
+                            <a class=" nav-link custom-btn custom-border-btn custom-btn-bg-white btn" href="#">Get started</a>
+                            <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
+                                <li><a class="dropdown-item" href="{% url 'viewlogin' %}">Customer</a></li>
+
+                               
+                                <li><a class="dropdown-item" href="{% url 'foodlogin' %}">Food Court </a></li>
+                              
+                            </ul>
+                        </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -141,7 +163,7 @@ Free Bootstrap 5 HTML Template
                             </a>
 
                             <a class="custom-btn custom-border-btn custom-btn-bg-white btn button button--pan smoothscroll" href="#services-section">
-                                <span>Explore Services</span>
+                                <span>Explore </span>
                             </a>
                         </div>
 
@@ -150,6 +172,9 @@ Free Bootstrap 5 HTML Template
 
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#ffffff" fill-opacity="1" d="M0,224L40,229.3C80,235,160,245,240,250.7C320,256,400,256,480,240C560,224,640,192,720,176C800,160,880,160,960,138.7C1040,117,1120,75,1200,80C1280,85,1360,139,1400,165.3L1440,192L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"></path></svg>
             </section>
+
+
+            
 
 
             <section class="intro-section" id="intro-section">
@@ -183,60 +208,69 @@ Free Bootstrap 5 HTML Template
             </section>
 
 
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
             <section class="services-section section-padding section-bg" id="services-section">                
                 <div class="container">
                     <div class="row">
 
                         <div class="col-lg-12 col-12">
-                            <h2 class="mb-4">Our best offers</h2>
+                            <h2 class="mb-4">Our attractions</h2>
                         </div>
 
-                        <div class="col-lg-6 col-12">
+                        <div class="col-lg-6 col-12" id='category'>
+                            {% for t in itms %}
                             <div class="services-thumb">
                                 <div class="row">
                                     <div class="col-lg-5 col-md-5 col-12">
                                         <div class="services-image-wrap">
                                             <a href="services-detail.html">
-                                                <img src="{% static 'images/ex2.jpg'%}" class="services-image img-fluid" alt="">
-                                                <img src="{% static 'images/ex3.jpg'%}" class="services-image services-image-hover img-fluid" alt="">
-
-                                                <div class="services-icon-wrap">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <p class="text-white mb-0">
-                                                            <i class="bi-cash me-2"></i>
-                                                           
-                                                        </p>
-
-                                                        <p class="text-white mb-0">
-                                                            <i class="bi-clock-fill me-2"></i>
-                                                            
-                                                        </p>
-                                                    </div>                                                    
-                                                </div>
+                                                <a href="/item/{{t.pk}}"><img class="services-image img-fluid" src="/media/{{t.image}}" style="height: 170px;"></a>
+                                                
                                             </a>
                                         </div>
                                     </div>
-
-                                    <div class="col-lg-7 col-md-7 col-12 d-flex align-items-center">
+                                    
+            
+                                    <div class="col-lg-7 col-md-7 col-12 d-flex align-items-center" >
                                         <div class="services-info mt-4 mt-lg-0 mt-md-0">
                                             <h4 class="services-title mb-1 mb-lg-2">
-                                                <a class="services-title-link" href="services-detail.html">­Roller coasters</a>
+                                                <a class="services-title-link" href="/item/{{t.pk}}">{{t.item}}</a>
                                             </h4>
-
+            
                                             <p>­Here you can learn about the favorites among the lesser-­known ride­s. Some are unique, some have been copied for decades, but all of them are vital to the atmosphere of the midway.</p>
-
+            
                                             <div class="d-flex flex-wrap align-items-center">
                                                 <div class="reviews-icons">
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star"></i>
-                                                    <i class="bi-star"></i>
+                                                    
                                                 </div>
-
-                                                <a href="services-detail.html" class="custom-btn btn button button--atlas mt-2 ms-auto">
+            
+                                                <a href="/item/{{t.pk}}" class="custom-btn btn button button--atlas mt-2 ms-auto">
                                                     <span>Learn More</span>
-
+            
                                                     <div class="marquee" aria-hidden="true">
                                                         <div class="marquee__inner">
                                                             <span>Learn More</span>
@@ -251,54 +285,42 @@ Free Bootstrap 5 HTML Template
                                     </div>
                                 </div>
                             </div>
+                            {% endfor %}
                         </div>
-
-                        <div class="col-lg-6 col-12">
+            
+                        <div class="col-lg-6 col-12" id='category'>
+                            {% for c in categories %}
                             <div class="services-thumb">
                                 <div class="row">
                                     <div class="col-lg-5 col-md-5 col-12">
                                         <div class="services-image-wrap">
                                             <a href="services-detail.html">
-                                                <img src="{% static 'images/ex4.jpg' %}" class="services-image img-fluid" alt="">
-                                                <img src="{% static 'images/ex5.jpg' %}" class="services-image services-image-hover img-fluid" alt="">
-
-                                                <div class="services-icon-wrap">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <p class="text-white mb-0">
-                                                            <i class="bi-cash me-2"></i>
-                                                            
-                                                        </p>
-
-                                                        <p class="text-white mb-0">
-                                                            <i class="bi-clock-fill me-2"></i>
-                                                            
-                                                        </p>
-                                                    </div>                                                    
-                                                </div>
+                                                <a href="/category/{{c.pk}}"><img class="card-img-top" src="/media/{{c.category_image}}" style="height: 200px;" ></a>
+                                                
+            
+                                                                                               
+                                                
                                             </a>
                                         </div>
                                     </div>
-
+                                    
+            
                                     <div class="col-lg-7 col-md-7 col-12 d-flex align-items-center">
                                         <div class="services-info mt-4 mt-lg-0 mt-md-0">
                                             <h4 class="services-title mb-1 mb-lg-2">
-                                                <a class="services-title-link" href="services-detail.html">Carousel</a>
+                                                <a class="services-title-link" href="/category/{{c.pk}}">{{c.title}}</a>
                                             </h4>
-
-                                            <p>The carousel, or merry-go-round, remains a carnival staple worldwide. The ride consists of a rotating platform with seats that move up and down. The seats are the really special part, made of wood, fiberglass, or plastic and shaped to look like decorated animals, such as deer, cats, fish, rabbits, giraffes, and, of course, horses. </p>
-
+            
+                                            <p>­Here you can learn about the favorites among the lesser-­known ride­s. Some are unique, some have been copied for decades, but all of them are vital to the atmosphere of the midway.</p>
+            
                                             <div class="d-flex flex-wrap align-items-center">
                                                 <div class="reviews-icons">
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
+                                                  
                                                 </div>
-
-                                                <a href="services-detail.html" class="custom-btn btn button button--atlas mt-2 ms-auto">
+            
+                                                <a href="/category/{{c.pk}}" class="custom-btn btn button button--atlas mt-2 ms-auto">
                                                     <span>Learn More</span>
-
+            
                                                     <div class="marquee" aria-hidden="true">
                                                         <div class="marquee__inner">
                                                             <span>Learn More</span>
@@ -313,131 +335,10 @@ Free Bootstrap 5 HTML Template
                                     </div>
                                 </div>
                             </div>
+                            {% endfor %}
                         </div>
+            
 
-                        <div class="col-lg-6 col-12">
-                            <div class="services-thumb mb-lg-0">
-                                <div class="row">
-                                    <div class="col-lg-5 col-md-5 col-12">
-                                        <div class="services-image-wrap">
-                                            <a href="services-detail.html">
-                                                <img src="{% static 'images/ch1.jpg' %}" class="services-image img-fluid" alt="">
-                                                <img src="{% static 'images/ch2.jpg' %}" class="services-image services-image-hover img-fluid" alt="">
-
-                                                <div class="services-icon-wrap">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <p class="text-white mb-0">
-                                                            <i class="bi-cash me-2"></i>
-                                                           
-                                                        </p>
-
-                                                        <p class="text-white mb-0">
-                                                            <i class="bi-clock-fill me-2"></i>
-                                                            
-                                                        </p>
-                                                    </div>                                                    
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-7 col-md-7 col-12 d-flex align-items-center">
-                                        <div class="services-info mt-4 mt-lg-0 mt-md-0">
-                                            <h4 class="services-title mb-1 mb-lg-2">
-                                                <a class="services-title-link" href="services-detail.html">The Rotor</a>
-                                            </h4>
-
-                                            <p>Designed in the 1940s by engineer Ernst Hoffmeister, the Rotor has many versions in theme parks all over the world. The premise is pretty much a simple lesson in centrifugal force: Take a large barrel and revolve the walls of said barrel really fast. When it's going super fast, drop the bottom out of the barrel, and watch as all the people inside stick to the walls. </p>
-
-                                            <div class="d-flex flex-wrap align-items-center">
-                                                <div class="reviews-icons">
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                </div>
-
-                                                <a href="services-detail.html" class="custom-btn btn button button--atlas mt-2 ms-auto">
-                                                    <span>Learn More</span>
-
-                                                    <div class="marquee" aria-hidden="true">
-                                                        <div class="marquee__inner">
-                                                            <span>Learn More</span>
-                                                            <span>Learn More</span>
-                                                            <span>Learn More</span>
-                                                            <span>Learn More</span>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6 col-12">
-                            <div class="services-thumb mb-lg-0">
-                                <div class="row">
-                                    <div class="col-lg-5 col-md-5 col-12">
-                                        <div class="services-image-wrap">
-                                            <a href="services-detail.html">
-                                                <img src="{% static 'images/ch3.jpg' %}" class="services-image img-fluid" alt="">
-                                                <img src="{% static 'images/ch4.jpg' %}" class="services-image services-image-hover img-fluid" alt="">
-
-                                                <div class="services-icon-wrap">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <p class="text-white mb-0">
-                                                            <i class="bi-cash me-2"></i>
-                                                            
-                                                        </p>
-
-                                                        <p class="text-white mb-0">
-                                                            <i class="bi-clock-fill me-2"></i>
-                                                            
-                                                        </p>
-                                                    </div>                                                    
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-7 col-md-7 col-12 d-flex align-items-center">
-                                        <div class="services-info mt-4 mt-lg-0 mt-md-0">
-                                            <h4 class="services-title mb-1 mb-lg-2">
-                                                <a class="services-title-link" href="services-detail.html">Bumper Cars</a>
-                                            </h4>
-
-                                            <p>Bumper cars (or "dodgem cars"), which were introduced in the 1920s, feature a large ring or pen with a graphite floor designed to decrease friction. Riders climb into miniature electric cars that draw power from an overhead grid and proceed to slam into the other cars in the pen.</p>
-
-                                            <div class="d-flex flex-wrap align-items-center">
-                                                <div class="reviews-icons">
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star-fill"></i>
-                                                    <i class="bi-star"></i>
-                                                </div>
-
-                                                <a href="services-detail.html" class="custom-btn btn button button--atlas mt-2 ms-auto">
-                                                    <span>Learn More</span>
-
-                                                    <div class="marquee" aria-hidden="true">
-                                                        <div class="marquee__inner">
-                                                            <span>Learn More</span>
-                                                            <span>Learn More</span>
-                                                            <span>Learn More</span>
-                                                            <span>Learn More</span>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                     </div>
                 </div>
