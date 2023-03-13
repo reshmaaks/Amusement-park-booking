@@ -274,28 +274,36 @@ body {
         <h1>Add Food Items</h1>
       </div>
       <div class="form-content">
-        <form action="{%url 'foodadd' %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'edit_food_item' item.pk %}" method="POST" enctype="multipart/form-data">
+
             {% include 'alert.html' %}   
                 	{% csrf_token %}
           <div class="form-group">
             <label for="username">Brand Name</label>
-            <input type="text" id="brandname" name="brandname" required="required"/>
+            <input type="text" id="brandname" name="brandname" value="{{ item.brandname }}" required="required"/>
           </div>
           <div class="form-group">
             <label for="file">Image</label>
-            <input type="file" id="file" name="image" required="required"/>
+            {% if item.image %}
+              <img src="#" alt="{{ item.image }}">
+            
+            <input type="file" id="file"  value="{{ item.image }}" name="image" accept="image/*" required>
+            {% endif %}
           </div>
           
           <div class="form-group">
            
           </div>
           <div class="form-group">
-            <button type="submit">Add Item</button>
+           
+        </div>
+          <div class="form-group">
+            <button type="submit">Update Item</button>
           </div>
         </div>
-        <div class="form-group">
+        <!-- <div class="form-group">
           <input type="button" value="Go back!" onclick="history.back()">
-        </div>
+        </div> -->
         </form>
       </div>
     </div>

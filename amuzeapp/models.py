@@ -98,6 +98,7 @@ class item(models.Model):
 
     def __str__(self):
         return self.item
+
 class Category(models.Model):
     title = models.CharField(max_length=200,unique=True)
     items=models.ForeignKey(item,on_delete=models.CASCADE,null=True)
@@ -124,15 +125,16 @@ class Product(models.Model):
 
 class fooditem(models.Model):
     brandname = models.CharField(max_length=200, unique=True)
-    image = models.ImageField(upload_to='fitem-photo') 
+    image = models.ImageField(upload_to='media/cat-photo')
     def __str__(self):
         return self.brandname       
 
 class foodCategory(models.Model):
     title = models.CharField(max_length=200,unique=True)
-    items=models.ForeignKey(item,on_delete=models.CASCADE,null=True)
-    # descripsion = models.CharField(max_length=200)
-    category_image = models.ImageField(upload_to='f-photo')
+    items=models.ForeignKey(fooditem,on_delete=models.CASCADE,null=True)
+    category_image = models.ImageField(upload_to='media/f-photo')
 
     def __str__(self):
         return self.title    
+
+        

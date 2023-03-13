@@ -23,7 +23,16 @@ urlpatterns = [
     path('dashboard/',views.dashboard,name='dashboard'),
     path('foodlogout/',views.foodlogout,name='foodlogout'),
     path('foodadd/',views.foodadd,name='foodadd'),
-    path('fooddis/',views.fooddis,name='fooddis'),
+    path('fooddis/', views.fooddis, name='fooddis'),
+    path('Delete/<int:id>/',views.Delete,name='Delete'),
+    path('fooditem/<int:pk>/edit/', edit_food_item, name='edit_food_item'),
+    path('add_food_category/', views.add_food_category, name='add_food_category'),
+    path('food_category_dis/', views.food_category_dis, name='food_category_dis'),
+    path('edit_food_category/<int:pk>/', views.edit_food_category, name='edit_food_category'),
+    path('delete_food_category/<int:id>/',views.delete_food_category,name='delete_food_category'),
+
+
+
 
 
 

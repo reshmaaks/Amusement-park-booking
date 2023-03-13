@@ -1,7 +1,8 @@
 # import json
 # from django.http import JsonResponse
 from hashlib import sha256
-from django.shortcuts import render,redirect
+from django.http import HttpResponseBadRequest
+from django.shortcuts import render,redirect,get_object_or_404
 from .models import *
 from django.contrib import messages
 from django.contrib.auth import authenticate
@@ -218,20 +219,99 @@ def foodlogout(request):
 def foodadd(request):
     if request.method == 'POST':
         brandname = request.POST.get('brandname')
-        image = request.POST.get('file')
+        image = request.FILES.get('image')
         print(image)
         food_item = fooditem(brandname=brandname, image=image)
         food_item.save()
         messages.success(request, 'Food item added successfully!')
         return redirect('foodadd')
-        
     else:
         return render(request, 'foodadd.html')
 
+
 def fooddis(request):
-    if request.method == 'POST':
+    if 'email' in request.session:
         data=fooditem.objects.all()
         context={'data': data}
         return render(request,'fooddis.html',context)
     return redirect(dashboard)    
         
+def Delete(request,id):
+    food=fooditem.objects.filter(id=id)
+    food.delete()
+    messages.info(request,"Deleted")
+    return redirect(fooddis)        
+
+
+def edit_food_item(request, pk):
+    item = get_object_or_404(fooditem, pk=pk)
+
+    if request.method == 'POST':
+        # If the request method is POST, update the fooditem object with the new data
+        item.brandname = request.POST['brandname']
+        item.image = request.FILES['image']
+        item.save()
+
+        # Redirect to the fooditem detail page after editing the fooditem object
+        return redirect('fooddis')
+    else:
+        # If the request method is GET, render the edit fooditem form with the current data
+        return render(request, 'edit_food_item.html', {'item': item}) 
+
+
+
+def add_food_category(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        category_image = request.FILES.get('category_image')
+        item_id = request.POST.get('item_id')
+        if title and category_image and item_id:
+            item_instance = get_object_or_404(fooditem, pk=item_id)
+            category = foodCategory.objects.create(title=title, category_image=category_image, items=item_instance)
+            return redirect('food_category_dis')
+        else:
+            return HttpResponseBadRequest('Title, category image, and item ID are required')
+    items = fooditem.objects.all()
+    return render(request, 'add_food_category.html', {'items': items})   
+
+
+def edit_food_category(request, pk):
+    category = get_object_or_404(foodCategory, pk=pk)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        category_image = request.FILES.get('category_image')
+        item_id = request.POST.get('item_id')
+        if title and category_image and item_id:
+            item_instance = get_object_or_404(item, pk=item_id)
+            category.title = title
+            category.category_image = category_image
+            category.items = item_instance
+            category.save()
+            return redirect('food_category_dis')
+        else:
+            return HttpResponseBadRequest('Title, category image, and item ID are required')
+    items = item.objects.all()
+    return render(request, 'edit_food_category.html', {'category': category, 'items': items})  
+
+def food_category_dis(request):
+    if 'email' in request.session:
+        data=foodCategory.objects.all()
+        context={'data': data}
+        return render(request,'food_category_dis.html',context)
+    return redirect(dashboard)
+
+# def delete_food_category(request, pk):
+#     # category = get_object_or_404(foodCategory, pk=pk)
+#     category=foodCategory.objects.filter(pk=pk)
+#     if request.method == 'POST':
+#         category.delete()
+#         return redirect(food_category_dis)
+#     return render(request, 'food_category_dis.html')    
+
+
+ 
+def delete_food_category(request,id):
+    category=foodCategory.objects.filter(id=id)
+    category.delete()
+    messages.info(request,"Deleted")
+    return redirect(food_category_dis)  

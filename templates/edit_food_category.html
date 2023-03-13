@@ -258,6 +258,29 @@ body {
   background: #FFFFFF !important;
   color: #4285F4 !important;
 }
+
+.dropdown {
+    width: 640px;
+    height: 50px;
+    background-color: rgba(126, 125, 125, 0.2);
+    shape-outside: -moz-radial-gradient();
+   position: absolute;
+   display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 1;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: none;
+}
+
+
+
 </style>
 
 
@@ -274,21 +297,36 @@ body {
         <h1>Add Food Items</h1>
       </div>
       <div class="form-content">
-        <form action="{%url 'foodadd' %}" method="POST" enctype="multipart/form-data">
+        <form method="POST" action="{% url 'edit_food_category' category.pk %}" enctype="multipart/form-data">
             {% include 'alert.html' %}   
                 	{% csrf_token %}
-          <div class="form-group">
-            <label for="username">Brand Name</label>
-            <input type="text" id="brandname" name="brandname" required="required"/>
-          </div>
-          <div class="form-group">
-            <label for="file">Image</label>
-            <input type="file" id="file" name="image" required="required"/>
-          </div>
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ category.title }}" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="category_image">Category Image:</label>
+                        <input type="file" class="form-control" id="category_image" name="category_image">
+                      </div>
+                      <div class="form-group">
+                        <label for="item_id">Item:</label>
+                        <select class="form-control" id="item_id" name="item_id">
+                          {% for item in items %}
+                            {% if item == category.items %}
+                              <option value="{{ item.pk }}" selected>{{ item.name }}</option>
+                            {% else %}
+                              <option value="{{ item.pk }}">{{ item.name }}</option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+            </div>
           
           <div class="form-group">
            
           </div>
+          <div class="form-group">
+           
+        </div>
           <div class="form-group">
             <button type="submit">Add Item</button>
           </div>
