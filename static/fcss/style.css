@@ -411,7 +411,7 @@ button:focus {
 ============================================================================================ */
 .home_banner_area {
   z-index: 1;
-  background: url(../images/img/banner/home-banner.jpg) no-repeat scroll center center;
+  background: url(../images/img/banner/b2.jpg) no-repeat scroll center center;
   background-size: cover; }
   @media (max-width: 767px) {
     .home_banner_area {

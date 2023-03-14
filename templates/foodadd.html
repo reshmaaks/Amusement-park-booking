@@ -9,7 +9,7 @@ html {
 }
 
 body {
-  background: linear-gradient(45deg, rgba(66, 183, 245, 0.8) 0%, rgba(66, 245, 189, 0.4) 100%);
+
   color: rgba(0, 0, 0, 0.6);
   font-family: "Roboto", sans-serif;
   font-size: 14px;
@@ -64,7 +64,7 @@ body {
   left: 50%;
   width: 30px;
   height: 4px;
-  background: #4285F4;
+
   transform: translate(-50%, -50%);
 }
 .form-toggle:before {
@@ -155,7 +155,7 @@ body {
   margin: 0 10px 0 0;
 }
 .form-group .form-recovery {
-  color: #4285F4;
+
   font-size: 12px;
   text-decoration: none;
 }
@@ -183,7 +183,7 @@ body {
   position: absolute;
   top: 0;
   left: 95%;
-  background: #4285F4;
+  background: #ffffff;
   width: 100%;
   min-height: 100%;
   padding: 60px calc(10% + 60px) 60px 60px;
@@ -256,16 +256,67 @@ body {
 
 .cp-fab {
   background: #FFFFFF !important;
-  color: #4285F4 !important;
+  color: #ffffff !important;
 }
 </style>
 
 
 
 
+<link rel="icon" href="{% static 'images/img/favicon.png' %}" type="image/png">
+<title>SteakShop Restaurant</title>
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="{% static 'fcss/bootstrap.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/linericon/style.css' %}">
+<link rel="stylesheet" href="{% static 'fcss/font-awesome.min.css' %}">
+<link rel="stylesheet" href="{% static 'fcss/magnific-popup.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/owl-carousel/owl.carousel.min.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/lightbox/simpleLightbox.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/nice-select/css/nice-select.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/jquery-ui/jquery-ui.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/animate-css/animate.css' %}">
+<!-- main css -->
+<link rel="stylesheet" href="{% static 'fcss/style.css' %}">
+</head>
+
+<body >
 
 
-<body style="background-image:url('../static/images/img/banner/home-banner.jpg');">
+<!--================ Start Header Menu Area =================-->
+
+<header class="fixed-menu">
+  <span class="menu-close"><i class="fa fa-times"></i></span>
+  <div class="menu-header">
+    <div class="logo d-flex justify-content-center">
+      <img src="{% static 'images/img/logo.png' %}" alt=""> 
+    </div><h3>
+    <center><br>Brands</center> </h3> 
+  </div>
+ 
+  <div class="nav-wraper">
+    <div class="navbar">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link active" href="{% url 'dashboard' %}"> home</a></li>
+
+        
+
+        <li class="nav-item submenu dropdown">
+          <a class="nav-link dropdown" href="#" data-toggle="dropdown" role="button" aria-haspopup="true"
+           aria-expanded="false"></a>
+        
+            <li class="nav-item"><a class="nav-link" href="{% url 'foodadd' %}">Add </a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'fooddis' %}">view </a></li>
+        
+
+
+       
+        </li>
+        
+        <!-- <li class="nav-item"><a class="nav-link" href="contact.html"><img src="{% static 'images/img/header/nav-icon8.png' %}" alt="">contact</a></li> -->
+      </ul>
+    </div>
+  </div>
+</header>
 
 <div class="form">
     <div class="form-toggle"></div>

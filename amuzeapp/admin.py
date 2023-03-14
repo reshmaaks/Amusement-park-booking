@@ -7,9 +7,15 @@ from django.contrib.auth.models import Group
 
 admin.site.unregister(Group)
 admin.site.register(fooditem)
+admin.site.register(foodCategory)
+admin.site.register(Adultpackage)
+admin.site.register(Childpackage)
+admin.site.register(Reviews)
+admin.site.register(Payments)
+admin.site.register(Placed_Booking)
 
 
-    
+ 
 # admin.site.register(Category)
 # class food_loginModelAdmin(admin.ModelAdmin):
 #     def has_add_permission(self, request, obj=None):
@@ -25,23 +31,23 @@ admin.site.register(fooditem)
 class CategoryModelAdmin(admin.ModelAdmin):
     list_display = ['id', 'title']
     list_editable = ['title',]
-    def has_add_permission(self, request, obj=None):
-        return False
-    def has_change_permission(self, request, obj=None):
-        return False
-    def has_delete_permission(self, request, obj=None):
-        return False
+    # def has_add_permission(self, request, obj=None):
+    #     return False
+    # def has_change_permission(self, request, obj=None):
+    #     return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
 @admin.register(item)
 class itemModelAdmin(admin.ModelAdmin):
     list_display = ['id', 'item']
     list_editable = ['item']
-    def has_add_permission(self, request, obj=None):
-        return False
-    def has_change_permission(self, request, obj=None):
-        return False
-    def has_delete_permission(self, request, obj=None):
-        return False
+    # def has_add_permission(self, request, obj=None):
+    #     return False
+    # def has_change_permission(self, request, obj=None):
+    #     return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
 
 def export_reg(modeladmin, request, queryset):

@@ -137,4 +137,58 @@ class foodCategory(models.Model):
     def __str__(self):
         return self.title    
 
+class Adultpackage(models.Model):
+    p1_id=models.AutoField(primary_key=True)
+    name=models.CharField(max_length=250,unique=True)
+    description=models.TextField(blank=True)
+    price=models.BigIntegerField(default=0)
+    available=models.BooleanField(default=True)
+    created=models.DateTimeField(auto_now_add=True)
+    updated=models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return str(self.name)
+
+
+class Childpackage(models.Model):
+    p2_id=models.AutoField(primary_key=True)
+    name=models.CharField(max_length=250,unique=True)
+    description=models.TextField(blank=True)
+    price=models.BigIntegerField(default=0)
+    available=models.BooleanField(default=True)
+    created=models.DateTimeField(auto_now_add=True)
+    updated=models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return str(self.name)        
         
+class Reviews(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100, blank=True)
+    review = models.CharField(max_length=500, blank=True)
+    # image= models.ImageField(upload_to='reviews/',blank=True,default=True)
+    star =models.IntegerField(default=False)
+
+
+    def _str_(self):
+        return str(self.user)
+
+
+
+class Payments(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE,null=True)
+    # name = models.CharField(max_length=100)
+    amount = models.CharField(max_length=100)
+    order_id = models.CharField(max_length=100, blank=True)
+    razorpay_payment_id = models.CharField(max_length=100, blank=True)
+    paid = models.BooleanField(default=False)  
+    def __str__(self):
+        return self.user      
+
+class Placed_Booking(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    # booking=models.ForeignKey(booking,on_delete=models.CASCADE,null=True,blank=True)
+    p1_id=models.ForeignKey(Adultpackage,on_delete=models.CASCADE,null=True,blank=True)
+    p2_id=models.ForeignKey(Childpackage,on_delete=models.CASCADE,null=True,blank=True)
+    date = models.DateField(auto_now_add=True)
+    payment=models.ForeignKey(Payments,on_delete=models.CASCADE,default="")
+    def __str__(self):
+        return self.user

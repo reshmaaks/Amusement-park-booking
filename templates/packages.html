@@ -397,8 +397,9 @@ content: '\e808';
                     <li>Table-service restaurants<i class="icon-ok"></i></li>
                     <li> allergen-free food options<i class="icon-ok"></i></li>
                 </ul>
+                {% if request.user.is_authenticated %}
                 <div class="lm-item-link">
-                    <a href="#">
+                    <a href="{% url 'dashboard' %}">
                         <svg width="152" height="52" xmlns="http://www.w3.org/2000/svg">
                             <defs>
                                 <linearGradient id="lm-gr-2" x1="0" y1="0" x2="100%" y2="100%">
@@ -411,76 +412,26 @@ content: '\e808';
                         </svg>
                     </a>
                 </div>
-            </div>
-            <div class="lm-item-bottom"></div>
-        </div>
-        <div class="lm-item lm-item-1">
-            <div class="lm-item-top"><span class="lm-item-title lm-underline">BUSINESS</span>
-                <div class="lm-item-price"><i class="icon-dollar"></i>2.997</div>
-            </div>
-            <div class="lm-item-body">
-                <div class="lm-item-desc"><strong>CUSTOM AIR</strong>
-                    <p>Air, air, air</p>
-                </div>
-                <ul class="lm-item-list">
-                    <li>iconic landmark <i class="icon-ok"></i></li>
-                    <li>Beautiful landscaping<i class="icon-ok"></i></li>
-                    <li>slow-moving indoor ride<i class="icon-ok"></i></li>
-                    <li> playground<i class="icon-ok"></i></li>
-                    <li>Table-service restaurants<i class="icon-ok"></i></li>
-                    <li> allergen-free food options<i class="icon-ok"></i></li>
-                </ul>
+                {% else %}
                 <div class="lm-item-link">
-                    <a href="#">
+                    <a href="{% url 'viewlogin' %}">
                         <svg width="152" height="52" xmlns="http://www.w3.org/2000/svg">
                             <defs>
-                                <linearGradient id="lm-gr-1" x1="0" y1="0" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="#241326"></stop>
-                                    <stop offset="100%" stop-color="#85468C"></stop>
+                                <linearGradient id="lm-gr-2" x1="0" y1="0" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#7E052D"></stop>
+                                    <stop offset="100%" stop-color="#F6266B"></stop>
                                 </linearGradient>
                             </defs>
-                            <rect x="1" y="1" width="150" height="50" rx="25" fill="#fff" stroke="url(#lm-gr-1)" stroke-width="1"></rect>
-                            <text x="23%" y="65%" fill="url(&quot;#lm-gr-1&quot;)">CHOOSE</text>
+                            <rect x="1" y="1" width="150" height="50" rx="25" fill="#fff" stroke="url(#lm-gr-2)" stroke-width="1"></rect>
+                            <text x="23%" y="65%" fill="url(&quot;#lm-gr-2&quot;)">CHOOSE</text>
                         </svg>
                     </a>
                 </div>
-            </div>
-            <div class="lm-item-bottom"><span class="lm-underline">Choose now </span>and we meet tomorrow!</div>
-        </div>
-        <div class="lm-item lm-item-3">
-            <div class="lm-item-top"><span class="lm-item-title lm-underline">PREMIUM</span>
-                <div class="lm-item-price"><i class="icon-dollar"></i>5.005</div>
-            </div>
-            <div class="lm-item-body">
-                <div class="lm-item-desc"><strong>CUSTOM AIR</strong>
-                    <p>Air, air, air</p>
-                </div>
-                <ul class="lm-item-list">
-                    <li>iconic landmark <i class="icon-ok"></i></li>
-                    <li>Beautiful landscaping<i class="icon-ok"></i></li>
-                    <li>slow-moving indoor ride<i class="icon-ok"></i></li>
-                    <li> playground<i class="icon-ok"></i></li>
-                    <li>Table-service restaurants<i class="icon-ok"></i></li>
-                    <li> allergen-free food options<i class="icon-ok"></i></li>
-                </ul>
-                <div class="lm-item-link">
-                    <a href="#">
-                        <svg width="152" height="52" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <linearGradient id="lm-gr" x1="0" y1="0" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="#1A466F"></stop>
-                                    <stop offset="100%" stop-color="#4D93D5"></stop>
-                                </linearGradient>
-                            </defs>
-                            <rect x="1" y="1" width="150" height="50" rx="25" fill="#fff" stroke="url(#lm-gr)" stroke-width="1"></rect>
-                            <text x="23%" y="65%" fill="url(&quot;#lm-gr&quot;)">CHOOSE</text>
-                        </svg>
-                    </a>
-                </div>
+            {% endif %}
             </div>
             <div class="lm-item-bottom"></div>
         </div>
-    </div>
+
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script>
         (function() {
