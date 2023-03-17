@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Booking Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+
+
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	<style>
+		body {
+            
+			background-color: #f5f5f5;
+		}
+
+		.booking-form {
+            opacity: .9;
+			background-color: #fff;
+			border-radius: 5px;
+			box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+			padding: 30px;
+			margin-top: 100px;
+			margin-bottom: 100px;
+		}
+
+		.booking-form h2 {
+			font-size: 24px;
+			font-weight: 700;
+			color: #333;
+			margin-bottom: 30px;
+		}
+
+		.form-group label {
+			font-size: 16px;
+			font-weight: 600;
+			color: #666;
+			margin-bottom: 10px;
+		}
+
+		.flatpickr-input {
+			height: 50px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+			padding: 10px 15px;
+			font-size: 16px;
+			font-weight: 400;
+			color: #333;
+			outline: none;
+		}
+
+		.flatpickr-input:focus {
+			border: 1px solid #007bff;
+		}
+
+		.select2-container {
+			width: 100%;
+		}
+
+		.input-number {
+			height: 50px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+			padding: 10px 15px;
+			font-size: 16px;
+			font-weight: 400;
+			color: #333;
+			outline: none;
+			text-align: center;
+		}
+
+		.input-group-prepend, .input-group-append {
+			height: 50px;
+			min-width: 50px;
+			border-radius: 5px;
+			background-color: #007bff;
+			color: #fff;
+			font-size: 18px;
+			font-weight: 400;
+			border: none;
+			outline: none;
+		}
+
+		.input-group-prepend i, .input-group-append i {
+			color: #fff;
+		}
+
+		.input-group-prepend:hover, .input-group-append:hover {
+			background-color: #0062cc;
+		}
+
+		.btn-book {
+			background-color: #007bff;
+			color: #fff;
+			border-radius: 5px;
+			padding: 15px 30px;
+			font-size: 18px;
+			font-weight: 600;
+			border: none;
+			outline: none;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+
+		.btn-book:hover {
+			background-color: #0062cc;
+		}
+        
+	</style>
+</head>
+
+<body >
+
+
+<div class="container " style="background-image:url('../static/images/x1.jpg');">
+	<div class="row">
+		<div class="col-md-8 offset-md-2 booking-form">
+			<h2>				Booking Details</h2>
+			<form method="POST"  action="{% url 'checkout' booking_id=latest_booking.id %}"  id="myform">
+                {% include 'alert.html' %}  
+				{% csrf_token %}
+				<div class="form-group">
+				
+					<label for="date"> Date: {{latest_booking.date}}</label>
+					
+				</div>
+                <div class="form-group">
+                    <label for="adult-package"> Adult Package:{{latest_booking.p1_id.name}}</label>
+                    
+                </div>
+                <label for="adults">Number of Adults:{{latest_booking.count_adult}}</label>
+			<div class="quantity">
+				
+			</div><br>
+
+                <div class="form-group">
+                    <label for="adult-package">Select Child Package:{{latest_booking.p2_id.name}}</label>
+                    
+                </div>
+
+			
+			
+			<label for="children">Number of Children:{{latest_booking.count_child}}</label>
+			<div class="quantity">
+				
+			</div><br>
+			<div class="form-group">
+				<label for="total_price">Total Price:</label>
+				<input type="text" name="total_price" id="total-price" value="{{latest_booking.total_price}}" readonly>
+			   </div>
+		
+			   <div class="col-md-3">
+                <div class="form-btn">
+                  <button id="rzp-button1" class="submit-btn">PAYMENT</button>
+                </div>
+              </div> 
+			</form>
+
+			<script>
+   
+				var options = {
+                  "key": "rzp_test_wT8W2jNy560ysZ", // Enter the Key ID generated from the Dashboard
+                  "amount": "{% widthratio latest_booking.total_price 1 100 %}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                  "currency": "INR",
+                  "name": "Amusement Park",
+                  "description": "Test Transaction",
+                  "image": "https://example.com/your_logo",
+                  "order_id": "{{order_id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                  "handler": function (response){
+                   console.log(
+                      {
+                        razorpay_payment_id:response.razorpay_payment_id,
+                        razorpay_order_id:response.razorpay_order_id,
+                        razorpay_signature:response.razorpay_signature
+                      }
+
+                    );
+				
+                    var form = document.getElementById["myform"];
+                        var a = response.razorpay_payment_id;
+                        window.location.href = `http://127.0.0.1:8000/paymentdone?payment_id=`+a
+                      
+                  },
+                  "prefill": {
+                      "name": "Gaurav Kumar",
+                      "email": "gaurav.kumar@example.com",
+                      "contact": "9000090000"
+                  },
+                  "theme": {
+                      "color": "#3399cc"
+                  }
+              };
+              var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response){
+          alert(response.error.code);
+          alert(response.error.description);
+          alert(response.error.source);
+          alert(response.error.step);
+          alert(response.error.reason);
+          alert(response.error.metadata.order_id);
+          alert(response.error.metadata.payment_id);
+		});
+		document.getElementById('rzp-button1').onclick = function(e){
+			rzp1.open();
+			e.preventDefault();
+		}
+         </script>
+		</div>
+	</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+			
+</body>
+</html>
+{% endblock %}

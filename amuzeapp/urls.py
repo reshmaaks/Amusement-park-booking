@@ -2,6 +2,7 @@ from django.urls import path, include
 from amuzeapp import views
 from .views import*
 from django.conf import settings
+from django.conf import admin
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 urlpatterns = [
@@ -30,14 +31,22 @@ urlpatterns = [
     path('food_category_dis/', views.food_category_dis, name='food_category_dis'),
     path('edit_food_category/<int:pk>/', views.edit_food_category, name='edit_food_category'),
     path('delete_food_category/<int:id>/',views.delete_food_category,name='delete_food_category'),
+    path('booking/', views.booking, name='booking'),
+    path('paymentdone/', views.paymentdone, name='paymentdone'),
+    path('checkout/<int:booking_id>/', checkout, name='checkout'),
 
 
 
 
 
-
-
-
+ 
     
 
 ]    
+
+
+
+admin.site.site_header="Amusement Park"
+admin.site.site_title="Amusement Park"
+admin.site.site_index_title="welcom to Amusement Park"
+

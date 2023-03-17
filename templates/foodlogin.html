@@ -49,7 +49,7 @@
 				</form>
 			</div>
 			<div class="login">
-				<form onsubmit = "return validatee() &&  emailValidation() && passwordValidation()"  action="{% url 'foodlogin' %}" method="POST">
+				<form onsubmit = "return validatee()"  action="{% url 'foodlogin' %}" method="POST">
 					{% csrf_token %}
 					<label for="chk" aria-hidden="true">Login</label>
 					<input type="email" name="email" placeholder="Email" onkeyup='emailValidation(this)' required="">

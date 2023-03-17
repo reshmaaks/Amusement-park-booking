@@ -1,7 +1,9 @@
 # import json
 # from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from hashlib import sha256
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import *
 from django.contrib import messages
@@ -20,7 +22,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.views.decorators.cache import cache_control 
 # from django.contrib.auth.decorators import login_required
-# import razorpay 
+import razorpay 
 from django.conf import settings
 
 def index(request):
@@ -61,7 +63,6 @@ def dashboard(request):
         email=request.session['email']
         return render(request,'dashboard.html',{'name':email})
     return redirect (foodlogin)    
-        
 
 def contact(request):
     return render(request,'contact.html')
@@ -315,3 +316,102 @@ def delete_food_category(request,id):
     category.delete()
     messages.info(request,"Deleted")
     return redirect(food_category_dis)  
+
+
+
+#booking
+
+import razorpay
+
+@login_required
+def booking(request):
+    if request.method == 'POST':
+        user = request.user
+        p1_id = request.POST.get('p1_id')
+        p2_id = request.POST.get('p2_id')
+        date = request.POST.get('date')
+        count_adult = int(request.POST.get('count1', 1))
+        count_child = int(request.POST.get('count2', 0))
+
+        try:
+            p1 = Adultpackage.objects.get(p1_id=p1_id)
+        except Adultpackage.DoesNotExist:
+            p1 = None
+        try:
+            p2 = Childpackage.objects.get(p2_id=p2_id)
+        except Childpackage.DoesNotExist:
+            p2 = None
+
+        if p1 is None:
+            messages.error(request, 'Invalid package selected.')
+            return redirect('booking')
+
+        total_price = (count_adult * p1.price) + (count_child * p2.price)
+        booking = Book.objects.create(user=user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child, total_price=total_price)
+        messages.success(request, 'Booking successful.')
+        return redirect('checkout', booking.id)
+    
+    # Get all available packages for the form
+    adult_packages = Adultpackage.objects.all()
+    child_packages = Childpackage.objects.all()
+
+    return render(request, 'booking.html', {'adult_packages': adult_packages, 'child_packages': child_packages})
+    
+def checkout(request, booking_id):
+    
+ 
+        latest_booking = Book.objects.get(id=booking_id)
+        client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET_KEY))
+        data = {
+            'amount': latest_booking.total_price * 100,  # Convert to paise
+            'currency': 'INR',
+            'receipt': str(latest_booking.id),
+            'payment_capture': 1,
+        }
+        order = client.order.create(data=data)
+        order_id = order['id']
+        request.session['order_id'] = order_id
+        request.session['booking_id'] = booking_id
+        
+        razorpay_payment_id = request.GET.get('razorpay_payment_id')
+        order_status = order['status']
+        if order_status == 'created':
+            payment = Payments.objects.create(
+                user=latest_booking.user,
+                amount=latest_booking.total_price,
+                razorpay_order_id=order_id,
+                razorpay_payment_status=order_status,
+                razorpay_payment_id = razorpay_payment_id,
+                paid=False
+            )
+            latest_booking.payment = payment
+            latest_booking.save()
+            # return redirect(request,'success.html')
+
+        return render(request, 'checkout.html', {'latest_booking': latest_booking, 'order_id': order_id})
+
+
+
+def paymentdone(request):
+    order_id=request.GET.get('razorpay_order_id')
+    payment_id=request.POST.get('razorpay_payment_id')
+    print(order_id)
+    print(payment_id)
+    user=request.user   
+    try:
+        payment=Payments.objects.get(razorpay_order_id=order_id)
+    except Payments.DoesNotExist:
+        return HttpResponse("Payment does not exist for the given order ID") 
+    payment.paid=True
+    payment.razorpay_payment_id=payment_id
+    payment.save()   
+    booking=Book.objects.get(id=request.session['booking_id'])
+    Placed_Booking.objects.create(
+        user=user,
+        p1_id=booking.p1_id,
+        p2_id=booking.p2_id,
+        date=booking.date,
+        payment=payment
+    )
+    booking.delete()
+    return redirect('index')

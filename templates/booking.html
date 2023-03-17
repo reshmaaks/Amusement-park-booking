@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Booking Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+
+
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	<style>
+		body {
+            
+			background-color: #f5f5f5;
+		}
+
+		.booking-form {
+            opacity: .9;
+			background-color: #fff;
+			border-radius: 5px;
+			box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+			padding: 30px;
+			margin-top: 100px;
+			margin-bottom: 100px;
+		}
+
+		.booking-form h2 {
+			font-size: 24px;
+			font-weight: 700;
+			color: #333;
+			margin-bottom: 30px;
+		}
+
+		.form-group label {
+			font-size: 16px;
+			font-weight: 600;
+			color: #666;
+			margin-bottom: 10px;
+		}
+
+		.flatpickr-input {
+			height: 50px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+			padding: 10px 15px;
+			font-size: 16px;
+			font-weight: 400;
+			color: #333;
+			outline: none;
+		}
+
+		.flatpickr-input:focus {
+			border: 1px solid #007bff;
+		}
+
+		.select2-container {
+			width: 100%;
+		}
+
+		.input-number {
+			height: 50px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+			padding: 10px 15px;
+			font-size: 16px;
+			font-weight: 400;
+			color: #333;
+			outline: none;
+			text-align: center;
+		}
+
+		.input-group-prepend, .input-group-append {
+			height: 50px;
+			min-width: 50px;
+			border-radius: 5px;
+			background-color: #007bff;
+			color: #fff;
+			font-size: 18px;
+			font-weight: 400;
+			border: none;
+			outline: none;
+		}
+
+		.input-group-prepend i, .input-group-append i {
+			color: #fff;
+		}
+
+		.input-group-prepend:hover, .input-group-append:hover {
+			background-color: #0062cc;
+		}
+
+		.btn-book {
+			background-color: #007bff;
+			color: #fff;
+			border-radius: 5px;
+			padding: 15px 30px;
+			font-size: 18px;
+			font-weight: 600;
+			border: none;
+			outline: none;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+
+		.btn-book:hover {
+			background-color: #0062cc;
+		}
+        
+	</style>
+</head>
+<body style="background-image:url('../static/images/x2.jpg');">
+
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-8 offset-md-2 booking-form">
+			<h2>				Booking Form</h2>
+			<form   action="{% url 'booking' %}" method="POST">
+                {% include 'alert.html' %}  
+				{% csrf_token %}
+				<div class="form-group">
+					<label for="date">Select Date:</label>
+					<input type="date" class="form-control" id="date" name="date" required>
+                    <small id="date-error" class="text-danger d-none">Please select a date in the future.</small>
+				</div>
+                <div class="form-group">
+                    <label for="adult-package">Select Adult Package:</label>
+                    <select class="form-control" id="adult-package" name="p1_id">
+                        <option value="" selected disabled>Select Adult Package</option> <!-- Default "Select" option -->
+                        {% if adult_packages %}
+                            {% for package in adult_packages %}
+                                <option value="{{ package.p1_id }}" data-price="{{ package.price }}">{{ package.name }} - ${{ package.price }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled>No adult packages available</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <label for="adults">Number of Adults:</label>
+			<div class="quantity">
+				<button id="minus-btn-adults" type="button">-</button>
+				<input type="text" id="adults" name="count1" value="1">
+				<button id="plus-btn-adults" type="button">+</button>
+			</div><br>
+
+                <div class="form-group">
+                    <label for="adult-package">Select Child Package:</label>
+                    <select class="form-control" id="child-package" name="p2_id">
+                        <option value="" selected disabled>Select Child Package</option> <!-- Default "Select" option -->
+                        {% if child_packages %}
+                            {% for package in child_packages %}
+                                <option value="{{ package.p2_id }}" data-price="{{ package.price }}">{{ package.name }} - ${{ package.price }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled>No Child packages available</option>
+                        {% endif %}
+                    </select>
+                </div>
+
+				
+			
+			<label for="children">Number of Children:</label>
+			<div class="quantity">
+				<button id="minus-btn-children" type="button">-</button>
+				<input type="text" id="children" name="count2" value="0">
+				<button id="plus-btn-children" type="button">+</button>
+			</div><br>
+            <div>
+            <label for="total total_price">Total Amount :</label>
+            <input type="text" name="total_price" id="total-price" value="" readonly>
+        </div><br>
+            <script>
+                function updateTotalPrice() {
+                var adultPackageId = document.getElementById("adult-package").value;
+                var adultPackagePrice = document.getElementById("adult-package").options[document.getElementById("adult-package").selectedIndex].getAttribute("data-price");
+                var adultPackageCount = parseInt(document.getElementById("adults").value);
+
+                var childPackageId = document.getElementById("child-package").value;
+                var childPackagePrice = document.getElementById("child-package").options[document.getElementById("child-package").selectedIndex].getAttribute("data-price");
+                var childPackageCount = parseInt(document.getElementById("children").value);
+
+                var totalPrice = (adultPackagePrice * adultPackageCount) + (childPackagePrice * childPackageCount);
+                document.getElementById("total-price").value = totalPrice;
+                
+                document.getElementById("adults").value = adultPackageCount;
+                document.getElementById("children").value = childPackageCount;
+            }
+
+                document.getElementById("adult-package").addEventListener("change", updateTotalPrice);
+                document.getElementById("adults").addEventListener("change", updateTotalPrice);
+                document.getElementById("child-package").addEventListener("change", updateTotalPrice);
+                document.getElementById("children").addEventListener("change", updateTotalPrice);
+            </script>
+            <button type="submit" class="btn btn-book">Continue</button>
+			</form>
+
+
+          
+		</div>
+	</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        
+			// Increment and decrement buttons for adults input
+    document.getElementById("plus-btn-adults").addEventListener("click", function() {
+    document.getElementById("adults").value++;
+    updateTotalPrice();
+});
+
+document.getElementById("minus-btn-adults").addEventListener("click", function() {
+    if (document.getElementById("adults").value > 1) {
+        document.getElementById("adults").value--;
+        updateTotalPrice();
+    }
+});
+
+document.getElementById("plus-btn-children").addEventListener("click", function() {
+    document.getElementById("children").value++;
+    updateTotalPrice();
+});
+
+document.getElementById("minus-btn-children").addEventListener("click", function() {
+    if (document.getElementById("children").value > 0) {
+        document.getElementById("children").value--;
+        updateTotalPrice();
+    }
+});
+
+            const dateInput = document.getElementById('date');
+
+        // Get the current date
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+
+        // Add a change event listener to the date input
+        dateInput.addEventListener('change', () => {
+        // Get the selected date
+        const selectedDate = new Date(dateInput.value);
+
+        // Check if the selected date is valid
+        if (selectedDate < tomorrow) {
+            // Display an error message
+            const dateError = document.getElementById('date-error');
+            dateError.classList.remove('d-none');
+            dateInput.setCustomValidity('Please select a date from tomorrow onwards.');
+        } else {
+            // Hide the error message
+            const dateError = document.getElementById('date-error');
+            dateError.classList.add('d-none');
+            dateInput.setCustomValidity('');
+        }
+        });
+
+	$(document).ready(function() {
+		$('.select2').select2();
+		$('.input-number').each(function() {
+			var spinner = $(this),
+				input = spinner.find('input[type="text"]'),
+				btnUp = spinner.find('.input-group-append'),
+				btnDown = spinner.find('.input-group-prepend'),
+				min = input.attr('min'),
+				max = input.attr('max');
+
+			btnUp.on('click', function() {
+				var oldValue = parseFloat(input.val());
+				if (oldValue >= max) {
+					var newVal = oldValue;
+				} else {
+					var newVal = oldValue + 1;
+				}
+				spinner.find("input").val(newVal);
+				spinner.find("input").trigger("change");
+			});
+
+			btnDown.on('click', function() {
+                var oldValue = parseFloat(input.val());
+				if (oldValue <= min) {
+					var newVal = oldValue;
+				} else {
+					var newVal = oldValue - 1;
+				}
+				spinner.find("input").val(newVal);
+				spinner.find("input").trigger("change");
+			});
+		});
+
+		flatpickr('#date', {
+			enableTime: false,
+			dateFormat: 'Y-m-d',
+			minDate: 'today',
+			maxDate: new Date().fp_incr(30)
+		});
+	});
+    var options = {
+                  "key": "rzp_test_d7pbnQ23YtrZat", // Enter the Key ID generated from the Dashboard
+                  "amount": "{% widthratio i.total_price 1 100 %}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                  "currency": "INR",
+                  "name": "Amusement Park",
+                  "description": "Test Transaction",
+                  "image": "https://example.com/your_logo",
+                  // "order_id": "order_LLu9St2s7pYH3V", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                  "handler": function (response){
+                    console.log(
+                      {
+                        razorpay_payment_id:response.razorpay_payment_id,
+                        razorpay_order_id:response.razorpay_order_id,
+                        razorpay_signature:response.razorpay_signature
+                      }
+
+                    );
+                      window.location.href ="http://127.0.0.1:8000/payments"
+                      
+                  },
+                  "prefill": {
+                      "name": "Gaurav Kumar",
+                      "email": "gaurav.kumar@example.com",
+                      "contact": "9000090000"
+                  },
+                  "theme": {
+                      "color": "#3399cc"
+                  }
+              };
+              var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response){
+          alert(response.error.code);
+          alert(response.error.description);
+          alert(response.error.source);
+          alert(response.error.step);
+          alert(response.error.reason);
+          alert(response.error.metadata.order_id);
+          alert(response.error.metadata.payment_id);
+});
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+   
+</script>
+			
+</body>
+</html>
+{% endblock %}

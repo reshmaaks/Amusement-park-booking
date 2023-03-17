@@ -177,18 +177,35 @@ class Payments(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE,null=True)
     # name = models.CharField(max_length=100)
     amount = models.CharField(max_length=100)
-    order_id = models.CharField(max_length=100, blank=True)
-    razorpay_payment_id = models.CharField(max_length=100, blank=True)
+    razorpay_order_id = models.CharField(max_length=100, blank=True)
+    razorpay_payment_status=models.CharField(max_length=100, blank=True)
+    razorpay_payment_id = models.CharField(max_length=100, blank=True,null=True)
     paid = models.BooleanField(default=False)  
     def __str__(self):
         return self.user      
 
 class Placed_Booking(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
-    # booking=models.ForeignKey(booking,on_delete=models.CASCADE,null=True,blank=True)
     p1_id=models.ForeignKey(Adultpackage,on_delete=models.CASCADE,null=True,blank=True)
     p2_id=models.ForeignKey(Childpackage,on_delete=models.CASCADE,null=True,blank=True)
     date = models.DateField(auto_now_add=True)
     payment=models.ForeignKey(Payments,on_delete=models.CASCADE,default="")
     def __str__(self):
         return self.user
+
+
+
+class Book(models.Model):
+    user =models.ForeignKey(Account, on_delete=models.SET_NULL,null=True)
+    p1_id=models.ForeignKey(Adultpackage,on_delete=models.CASCADE,null=True,blank=True)
+    p2_id=models.ForeignKey(Childpackage,on_delete=models.CASCADE,null=True,blank=True)
+    date=models.DateField(auto_now = False)
+    count_adult=models.BigIntegerField(default=1)
+    count_child=models.BigIntegerField(default=1,null=True)
+    total_price=models.BigIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    # child_count=models.PositiveIntegerField(default=1)
+    # meals_name=models.ForeignKey(package,on_delete=models.CASCADE)
+    def __str__(self):
+        return str(self.user)        

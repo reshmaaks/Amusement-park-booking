@@ -32,7 +32,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    
     'jazzmin',
+    'razorpay',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -127,6 +129,8 @@ STATICFILES_ROOT =os.path.join(BASE_DIR,'assets')
 MEDIA_URL='/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
+RAZORPAY_API_KEY ='rzp_test_wT8W2jNy560ysZ'
+RAZORPAY_API_SECRET_KEY='vAFFGGHl7q41a2apR4pcZMgw'
 
 #SMTP Configruation
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
