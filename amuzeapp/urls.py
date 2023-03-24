@@ -2,7 +2,7 @@ from django.urls import path, include
 from amuzeapp import views
 from .views import*
 from django.conf import settings
-from django.conf import admin
+from django.contrib import admin
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 urlpatterns = [
@@ -24,7 +24,8 @@ urlpatterns = [
     path('dashboard/',views.dashboard,name='dashboard'),
     path('foodlogout/',views.foodlogout,name='foodlogout'),
     path('foodadd/',views.foodadd,name='foodadd'),
-    path('fooddis/', views.fooddis, name='fooddis'),
+    path('item_add/',views.item_add,name='item_add'),
+    path('food_dis/', views.food_dis, name='food_dis'),
     path('Delete/<int:id>/',views.Delete,name='Delete'),
     path('fooditem/<int:pk>/edit/', edit_food_item, name='edit_food_item'),
     path('add_food_category/', views.add_food_category, name='add_food_category'),
@@ -32,8 +33,15 @@ urlpatterns = [
     path('edit_food_category/<int:pk>/', views.edit_food_category, name='edit_food_category'),
     path('delete_food_category/<int:id>/',views.delete_food_category,name='delete_food_category'),
     path('booking/', views.booking, name='booking'),
-    path('paymentdone/', views.paymentdone, name='paymentdone'),
+    path('paymentdone', views.paymentdone, name='paymentdone'),
     path('checkout/<int:booking_id>/', checkout, name='checkout'),
+    path('item_view/', views.item_view, name='item_view'),
+    path('delete_item_view/<int:id>/',views.delete_item_view,name='delete_item_view'),
+    path('edit_item/<int:pk>/', views.edit_item, name='edit_item'),
+
+
+
+
 
 
 

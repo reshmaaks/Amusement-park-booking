@@ -1,0 +1,76 @@
+{% extends 'nav.html' %}
+{%  load static %}
+{% block content %}
+<!doctype html>
+<html lang="en">
+  <head>
+  	<title>Table 05</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="{% static 'table/css/style.css' %}">
+<style>
+	img {
+  border-radius: 50%;
+  height: 60px;
+  width: 60px;
+}
+
+</style>
+	</head>
+ 
+  <body style="background-image: url('https://wallpaperaccess.com/full/1306229.jpg');">
+	<section class="ftco-section">
+		<div class="container">
+		
+			<div class="row">
+				<div class="col-md-12">
+					<div class="table-wrap">
+						<table class="table table-responsive-xl">
+						  <thead>
+						    <tr>
+                  <th >Picture</th>
+                  <th >Name</th>
+                  <th >Category</th>
+                  <th >Price</th>
+                  <th >Edit</th>
+                  <th >Delete</th> 
+            
+						    </tr>
+						  </thead>
+						  <tbody>
+                {% for i in data %}
+                <tr>
+                   <td><img src="/media/{{i.product_image}}"  alt="" /></td>
+                   <td >{{i.name}}</td>
+                   <td>{{i.cat.title}}</td>
+                   <td>{{i.selling_price}}</td>
+
+     
+                   <td><a href="{% url 'edit_item' i.pk %}" ><i class="fa fa-pencil"></i></a></td>
+                   <td><a href="{% url 'delete_item_view' i.pk %}" name="prod_id"><i class="fa fa-trash"></i></a></td>
+                 
+                </tr>
+                
+          {% endfor %}
+						  </tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script src="{% static 'table/js/jquery.min.js' %}"></script>
+  <script src="{% static 'table/js/popper.js' %}"></script>
+  <script src="{% static 'table/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'table/js/main.js' %}"></script>
+
+	</body>
+</html>
+
+{% endblock %}

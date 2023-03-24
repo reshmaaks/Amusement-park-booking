@@ -218,81 +218,94 @@ def foodlogout(request):
 
 
 def foodadd(request):
-    if request.method == 'POST':
-        brandname = request.POST.get('brandname')
-        image = request.FILES.get('image')
-        print(image)
-        food_item = fooditem(brandname=brandname, image=image)
-        food_item.save()
-        messages.success(request, 'Food item added successfully!')
-        return redirect('foodadd')
-    else:
-        return render(request, 'foodadd.html')
+    if 'email' in request.session:
+
+        if request.method == 'POST':
+            brandname = request.POST.get('brandname')
+            image = request.FILES.get('image')
+            print(image)
+            food_item = fooditem(brandname=brandname, image=image)
+            food_item.save()
+            messages.success(request, 'Food item added successfully!')
+            return redirect('foodadd')
+        else:
+            return render(request, 'foodadd.html')
+    return redirect(dashboard)    
 
 
-def fooddis(request):
+def food_dis(request):
     if 'email' in request.session:
         data=fooditem.objects.all()
         context={'data': data}
-        return render(request,'fooddis.html',context)
+        return render(request,'food_dis.html',context)
     return redirect(dashboard)    
         
 def Delete(request,id):
-    food=fooditem.objects.filter(id=id)
-    food.delete()
-    messages.info(request,"Deleted")
-    return redirect(fooddis)        
+    if 'email' in request.session:
+        food=fooditem.objects.filter(id=id)
+        food.delete()
+        messages.info(request,"Deleted")
+        return redirect(food_dis)        
+    return redirect(dashboard)    
 
 
 def edit_food_item(request, pk):
-    item = get_object_or_404(fooditem, pk=pk)
+    if 'email' in request.session:
+        item = get_object_or_404(fooditem, pk=pk)
 
-    if request.method == 'POST':
-        # If the request method is POST, update the fooditem object with the new data
-        item.brandname = request.POST['brandname']
-        item.image = request.FILES['image']
-        item.save()
+        if request.method == 'POST':
+            # If the request method is POST, update the fooditem object with the new data
+            item.brandname = request.POST['brandname']
+            item.image = request.FILES['image']
+            item.save()
 
-        # Redirect to the fooditem detail page after editing the fooditem object
-        return redirect('fooddis')
-    else:
-        # If the request method is GET, render the edit fooditem form with the current data
-        return render(request, 'edit_food_item.html', {'item': item}) 
-
+            # Redirect to the fooditem detail page after editing the fooditem object
+            return redirect('food_dis')
+        else:
+            # If the request method is GET, render the edit fooditem form with the current data
+            return render(request, 'edit_food_item.html', {'item': item}) 
+    return redirect(dashboard)
 
 
 def add_food_category(request):
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        category_image = request.FILES.get('category_image')
-        item_id = request.POST.get('item_id')
-        if title and category_image and item_id:
-            item_instance = get_object_or_404(fooditem, pk=item_id)
-            category = foodCategory.objects.create(title=title, category_image=category_image, items=item_instance)
-            return redirect('food_category_dis')
-        else:
-            return HttpResponseBadRequest('Title, category image, and item ID are required')
-    items = fooditem.objects.all()
-    return render(request, 'add_food_category.html', {'items': items})   
+    if 'email' in request.session:
+        if request.method == 'POST':
+            title = request.POST.get('title')
+            category_image = request.FILES.get('category_image')
+            item_id = request.POST.get('item_id')
+            if title and category_image and item_id:
+                item_instance = get_object_or_404(fooditem, pk=item_id)
+                category = foodCategory.objects.create(title=title, category_image=category_image, items=item_instance)
+                return redirect('food_category_dis')
+            else:
+                return HttpResponseBadRequest('Title, category image, and item ID are required')
+        items = fooditem.objects.all()
+        return render(request, 'add_food_category.html', {'items': items})   
+    return redirect(dashboard)
+    
+
+def edit_food_category(request, pk):    
+    if 'email' in request.session:
+        category = get_object_or_404(foodCategory, pk=pk)
+        if request.method == 'POST':
+            title = request.POST.get('title')
+            category_image = request.FILES.get('category_image')
+            item_id = request.POST.get('item_id')
+            if title and item_id:
+                item_instance = get_object_or_404(fooditem, pk=item_id)
+                category.title = title
+                if category_image:
+                    category.category_image = category_image
+                category.items = item_instance
+                category.save()
+                return redirect('food_category_dis')
+            else:
+                return HttpResponseBadRequest('Title and item ID are required')
+        items = fooditem.objects.all()
+        return render(request, 'edit_food_category.html', {'category': category, 'items': items})  
+    return redirect('dashboard')
 
 
-def edit_food_category(request, pk):
-    category = get_object_or_404(foodCategory, pk=pk)
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        category_image = request.FILES.get('category_image')
-        item_id = request.POST.get('item_id')
-        if title and category_image and item_id:
-            item_instance = get_object_or_404(item, pk=item_id)
-            category.title = title
-            category.category_image = category_image
-            category.items = item_instance
-            category.save()
-            return redirect('food_category_dis')
-        else:
-            return HttpResponseBadRequest('Title, category image, and item ID are required')
-    items = item.objects.all()
-    return render(request, 'edit_food_category.html', {'category': category, 'items': items})  
 
 def food_category_dis(request):
     if 'email' in request.session:
@@ -312,10 +325,14 @@ def food_category_dis(request):
 
  
 def delete_food_category(request,id):
-    category=foodCategory.objects.filter(id=id)
-    category.delete()
-    messages.info(request,"Deleted")
-    return redirect(food_category_dis)  
+    if 'email' in request.session:
+        category=foodCategory.objects.filter(id=id)
+        category.delete()
+        messages.info(request,"Deleted")
+        return redirect(food_category_dis)  
+    # return redirect(dashboard)
+    return HttpResponse("Please Login") 
+
 
 
 
@@ -381,7 +398,7 @@ def checkout(request, booking_id):
                 amount=latest_booking.total_price,
                 razorpay_order_id=order_id,
                 razorpay_payment_status=order_status,
-                razorpay_payment_id = razorpay_payment_id,
+                # razorpay_payment_id = razorpay_payment_id,
                 paid=False
             )
             latest_booking.payment = payment
@@ -394,16 +411,16 @@ def checkout(request, booking_id):
 
 def paymentdone(request):
     order_id=request.GET.get('razorpay_order_id')
-    payment_id=request.POST.get('razorpay_payment_id')
+    # payment_id=request.POST.get('razorpay_payment_id')
     print(order_id)
-    print(payment_id)
+    # print(payment_id)
     user=request.user   
     try:
         payment=Payments.objects.get(razorpay_order_id=order_id)
     except Payments.DoesNotExist:
         return HttpResponse("Payment does not exist for the given order ID") 
     payment.paid=True
-    payment.razorpay_payment_id=payment_id
+    # payment.razorpay_payment_id=payment_id
     payment.save()   
     booking=Book.objects.get(id=request.session['booking_id'])
     Placed_Booking.objects.create(
@@ -415,3 +432,68 @@ def paymentdone(request):
     )
     booking.delete()
     return redirect('index')
+
+
+
+def item_add(request):
+    if 'email' in request.session:
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            product_image = request.FILES.get('product_image')
+            cat = request.POST.get('cat')
+            brand = request.POST.get('brand')
+
+            selling_price = request.POST.get('selling_price')
+            cat = get_object_or_404(foodCategory, pk=cat)
+            brand =get_object_or_404(fooditem, pk=brand)
+            if name and product_image and cat:
+                product = Product.objects.create(name=name, product_image=product_image, cat=cat,brand=brand, selling_price=selling_price)
+                messages.success(request,"Added Successfully")
+
+                return redirect('item_view')
+            else:
+                return HttpResponseBadRequest('Name, image, and category are required')
+        else:
+            categories = foodCategory.objects.all()
+            obj = fooditem.objects.all()
+
+            return render(request, 'item_add.html', {'obj':obj, 'items': categories})
+    return redirect(dashboard)
+
+def item_view(request):
+    if 'email' in request.session:
+        data=Product.objects.all()
+        context={'data': data}
+        return render(request,'item_view.html',context)
+    return redirect(dashboard)
+
+def delete_item_view(request,id):
+    if 'email' in request.session:
+        category=Product.objects.filter(id=id)
+        category.delete()
+        messages.info(request,"Deleted")
+        return redirect(item_view)  
+    # return redirect(dashboard)
+    return HttpResponse("Please Login") 
+
+def edit_item(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        product_image = request.FILES.get('product_image')
+        cat_id = request.POST.get('cat')
+        selling_price = request.POST.get('selling_price')
+        cat = get_object_or_404(foodCategory, pk=cat_id)
+        if name and cat:
+            product.name = name
+            if product_image:
+                product.product_image = product_image
+            product.cat = cat
+            product.selling_price = selling_price
+            product.save()
+            return redirect('item_view')
+        else:
+            return HttpResponseBadRequest('Name and category are required')
+    else:
+        categories = foodCategory.objects.all()
+        return render(request, 'edit_item.html', {'product': product, 'categories': categories})

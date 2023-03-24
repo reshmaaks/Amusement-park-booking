@@ -1,4 +1,8 @@
-{% load static %}
+{% extends 'nav.html' %}
+
+{%  load static %}
+
+{% block content %}
 <!DOCTYPE html>
 <head>
 
@@ -259,7 +263,7 @@ body {
   color: #4285F4 !important;
 }
 
-.dropdown {
+.dropdown1 {
     width: 640px;
     height: 50px;
     background-color: rgba(126, 125, 125, 0.2);
@@ -268,129 +272,84 @@ body {
    display: inline-block;
 }
 
-.dropdown-menu {
-  position: absolute;
-  z-index: 1;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: none;
-}
-
 
 
 </style>
 
+<body style="background-image: url('https://wallpaperaccess.com/full/1306229.jpg');">
 
-
-
-
-
-<link rel="icon" href="{% static 'images/img/favicon.png' %}" type="image/png">
-<title>SteakShop Restaurant</title>
-<!-- Bootstrap CSS -->
-<link rel="stylesheet" href="{% static 'fcss/bootstrap.css' %}">
-<link rel="stylesheet" href="{% static 'vendors/linericon/style.css' %}">
-<link rel="stylesheet" href="{% static 'fcss/font-awesome.min.css' %}">
-<link rel="stylesheet" href="{% static 'fcss/magnific-popup.css' %}">
-<link rel="stylesheet" href="{% static 'vendors/owl-carousel/owl.carousel.min.css' %}">
-<link rel="stylesheet" href="{% static 'vendors/lightbox/simpleLightbox.css' %}">
-<link rel="stylesheet" href="{% static 'vendors/nice-select/css/nice-select.css' %}">
-<link rel="stylesheet" href="{% static 'vendors/jquery-ui/jquery-ui.css' %}">
-<link rel="stylesheet" href="{% static 'vendors/animate-css/animate.css' %}">
-<!-- main css -->
-<link rel="stylesheet" href="{% static 'fcss/style.css' %}">
-</head>
-
-<body >
-
-
-<!--================ Start Header Menu Area =================-->
-
-<header class="fixed-menu">
-  <span class="menu-close"><i class="fa fa-times"></i></span>
-  <div class="menu-header">
-    <div class="logo d-flex justify-content-center">
-      <img src="{% static 'images/img/logo.png' %}" alt=""> 
-    </div><h3>
-    <center><br>Category</center> </h3> 
-  </div>
- 
-  <div class="nav-wraper">
-    <div class="navbar">
-      <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link active" href="{% url 'dashboard' %}"> home</a></li>
-
-        
-
-        <li class="nav-item submenu dropdown">
-          <a class="nav-link dropdown" href="#" data-toggle="dropdown" role="button" aria-haspopup="true"
-           aria-expanded="false"></a>
-        
-           <li class="nav-item"><a class="nav-link" href="{%url 'add_food_category' %}">Add </a></li>
-							<li class="nav-item"><a class="nav-link" href="{%url 'food_category_dis' %}">view </a></li>
-        
-
-
-       
-        </li>
-        
-        <!-- <li class="nav-item"><a class="nav-link" href="contact.html"><img src="{% static 'images/img/header/nav-icon8.png' %}" alt="">contact</a></li> -->
-      </ul>
-    </div>
-  </div>
-</header>
-
-
-<div class="form">
+  <div class="form">
     <div class="form-toggle"></div>
     <div class="form-panel one">
       <div class="form-header">
         <h1>Add Food Items</h1>
       </div>
       <div class="form-content">
-        <form action="{%url 'add_food_category' %}" method="POST" enctype="multipart/form-data">
-            {% include 'alert.html' %}   
-                	{% csrf_token %}
+        <form onsubmit="return validateForm()" action="{%url 'add_food_category' %}" method="POST" enctype="multipart/form-data">
+          {% include 'alert.html' %}
+          {% csrf_token %}
           <div class="form-group">
-            <label for="username">Brand Name</label>
-            <input type="text" id="brandname" name="title" required="required"/>
+            <label for="brandname">Category</label>
+            <input type="text" id="brandname" name="title" required="required" />
           </div>
           <div class="form-group">
             <label for="file">Image</label>
-            <input type="file" id="file" name="category_image" required="required"/>
+            <input type="file" id="file" name="category_image" required="required" accept="image/*" />
           </div>
           <div class="form-group">
             <label for="item_id"></label>
-        
-            <select id="category" name="item_id" class="dropdown" required="required">
-                <option value="" selected disabled>Select category</option>
-                {% for item in items %}
-                <option  value="{{ item.id }}">{{ item.brandname }}</option>
+  
+            <select id="category" name="item_id" class="dropdown1" required="required">
+              <option value="" selected disabled>Select category</option>
+              {% for item in items %}
+              <option value="{{ item.id }}">{{ item.brandname }}</option>
               {% endfor %}
-                
-              </select>
-            </div>
-          
+  
+            </select>
+          </div>
+  
           <div class="form-group">
-           
+  
           </div>
           <div class="form-group">
-           
-        </div>
+  
+          </div>
           <div class="form-group">
             <button type="submit">Add Item</button>
           </div>
-        </div>
-        <div class="form-group">
-          <input type="button" value="Go back!" onclick="history.back()">
-        </div>
         </form>
+       
       </div>
     </div>
-   
+  </div>
+  
+  <script>
+    function validateForm() {
+      // Get the input field values
+      var brandname = document.getElementById("brandname").value;
+      var file = document.getElementById("file").value;
+      
+      // Regular expressions to validate input fields
+      var brandnameRegex = /^[A-Za-z ]+$/;
+      var fileRegex = /^.*\.(jpg|jpeg|png|gif)$/i;
+      
+      // Check if brandname field is empty or not matching the regex pattern
+      if (brandname == "" || !brandname.match(brandnameRegex)) {
+        alert("Please enter a valid category name.");
+        return false;
+      }
+      
+      // Check if file field is empty or not matching the regex pattern
+      if (file == "" || !file.match(fileRegex)) {
+        alert("Please select a valid image file.");
+        return false;
+      }
+      
+      // Return true if all input fields are valid
+      return true;
+    }
+  </script>
+  
 
 <script>
     $(document).ready(function() {
@@ -421,3 +380,4 @@ body {
 </script>
 </body>
 </html>
+{% endblock %}

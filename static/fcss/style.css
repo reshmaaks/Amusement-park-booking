@@ -411,12 +411,12 @@ button:focus {
 ============================================================================================ */
 .home_banner_area {
   z-index: 1;
-  background: url(../images/img/banner/b2.jpg) no-repeat scroll center center;
+  background: url(https://www.purityproducts.com/hubfs/Blog/fast-food-american-diet.jpg) no-repeat scroll center center;
   background-size: cover; }
-  @media (max-width: 767px) {
+  @media (max-width: 0px) {
     .home_banner_area {
       background: none; } }
-  @media (max-width: 767px) {
+  @media (max-width: 0px) {
     .home_banner_area .banner_inner .fullscreen {
       height: 394px !important; } }
   .home_banner_area.overlay:after {

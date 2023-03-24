@@ -110,16 +110,7 @@ class Category(models.Model):
 
 
 
-class Product(models.Model):
-    name = models.CharField(max_length=200,unique=True)
-    cat = models.ForeignKey(Category, on_delete=models.CASCADE)
-    product_image = models.ImageField(upload_to='media')
-    # marked_price = models.PositiveIntegerField()
-    selling_price = models.PositiveIntegerField(null=True)
-    # stock=models.IntegerField(default=True)
 
-    def __str__(self):
-        return self.name
 
 
 
@@ -136,6 +127,18 @@ class foodCategory(models.Model):
 
     def __str__(self):
         return self.title    
+
+class Product(models.Model):
+    name = models.CharField(max_length=200,unique=True)
+    cat = models.ForeignKey(foodCategory, on_delete=models.CASCADE)
+    brand = models.ForeignKey(fooditem,on_delete=models.CASCADE,null=True)
+    product_image = models.ImageField(upload_to='media/p-image')
+    # marked_price = models.PositiveIntegerField()
+    selling_price = models.PositiveIntegerField(null=True)
+    # stock=models.IntegerField(default=True)
+
+    def __str__(self):
+        return self.name        
 
 class Adultpackage(models.Model):
     p1_id=models.AutoField(primary_key=True)
@@ -179,7 +182,7 @@ class Payments(models.Model):
     amount = models.CharField(max_length=100)
     razorpay_order_id = models.CharField(max_length=100, blank=True)
     razorpay_payment_status=models.CharField(max_length=100, blank=True)
-    razorpay_payment_id = models.CharField(max_length=100, blank=True,null=True)
+    # razorpay_payment_id = models.CharField(max_length=100, blank=True,null=True)
     paid = models.BooleanField(default=False)  
     def __str__(self):
         return self.user      
