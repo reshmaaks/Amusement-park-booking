@@ -35,6 +35,7 @@
 						    <tr>
                   <th >Picture</th>
                   <th >Name</th>
+                  <th >Brand</th>
                   <th >Category</th>
                   <th >Price</th>
                   <th >Edit</th>
@@ -47,6 +48,8 @@
                 <tr>
                    <td><img src="/media/{{i.product_image}}"  alt="" /></td>
                    <td >{{i.name}}</td>
+                   <td >{{i.brand.brandname}}</td>
+
                    <td>{{i.cat.title}}</td>
                    <td>{{i.selling_price}}</td>
 

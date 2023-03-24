@@ -1,6 +1,27 @@
-{% extends 'base.html' %}
+{% load static %}
+<html>
+    <head>
+        <style>
+            img {
+        border-radius: 50%;
+        height: 250px;
+        width: 250px;
+        }
 
-{% block content %}
-    <h1>Payment Successful</h1>
-    <p>Thank you for your payment!</p>
-{% endblock %}
+        </style>
+        </head>
+    <body>
+
+        {% block content %}
+        <center><img src="{% static 'images/check-circle.gif' %}">
+        <h1>Payment Successful</h1>
+            <p>Thank you for your payment!</p>
+            <br>
+            <br>
+            <h4>Download your tickets here!</h4></center> 
+
+
+
+        {% endblock %}
+    </body>
+</html>

@@ -90,12 +90,44 @@
 		button[type="submit"]:hover {
 			background-color: #555;
 		}
+		.tick {
+			color: green;
+			font-size: 14px;
+			margin-left: 10px;
+		}
+
+		.applied-offers {
+			color: green;
+			margin-top: 20px;
+		}
+
+		.applied-offers ul {
+			color: green;
+
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		.applied-offers ul li {
+			color: green;
+
+			font-size: 14px;
+			margin-bottom: 5px;
+		}
+		.applied-offers ul {
+        display: none;
+		}
+		.applied-offers.active ul {
+			display: block;
+		}
+
 	</style>
 </head>
 <body>
 	<h1> </h1>
-	<form method="POST"  action="{% url 'checkout' booking_id=latest_booking.id %}"  id="myform">
-		{% include 'alert.html' %}  
+	<form method="POST" action="{% url 'checkout' booking_id=latest_booking.id %}"  id="myform">
+		 
 		{% csrf_token %}
 		<label for="date">Date:</label>
 		<input type="text" id="date" name="date" value="{{latest_booking.date}}" readonly>
@@ -113,10 +145,39 @@
 			<label for="child-number">Number of Children:</label>
 			<input type="number" id="child-number" name="child-number" value="{{latest_booking.count_child}}" min="0" readonly>
 		</div>
-		<div class="total">
-			Total Price: ₹<span id="total-price">{{latest_booking.total_price}}</span>
+		<div class="applied-offers">
+			<p id="offer-title">Offer Applied </p>
+			<ul id="offer-details" style="display:none;">
+			{% if eligible_offers %}
+				{% for offer in eligible_offers %}
+				<li>{{ offer.name }} - {{ offer.discount_percentage }}% off<span class="tick">&#10003;</span></li>
+				{% endfor %}
+			</ul>
+		{% else %}
+		<li>No Offer Applied</li>
+		{% endif %}
+		
 		</div>
+		<script>
+			var offerTitle = document.getElementById("offer-title");
+			var offerDetails = document.getElementById("offer-details");
+
+			offerTitle.addEventListener("click", function() {
+			if (offerDetails.style.display === "none") {
+				offerDetails.style.display = "block";
+			} else {
+				offerDetails.style.display = "none";
+			}
+			});
+		</script>
+
+		<div class="total">
+			Total Price: ₹<span id="total-price">{{ latest_booking.total_price }}</span>
+		</div>
+		
 		<button id="rzp-button1" type="submit" class="submit-btn">PAYMENT</button>
+
+		
 	<script>
 
 		var options = {

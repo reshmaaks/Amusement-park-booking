@@ -13,6 +13,8 @@ admin.site.register(Childpackage)
 admin.site.register(Reviews)
 admin.site.register(Payments)
 admin.site.register(Placed_Booking)
+admin.site.register(Product)
+
 
 
 # admin.site.register(Category)
@@ -100,3 +102,11 @@ class foodcourtLoginAdmin(admin.ModelAdmin):
         return False
     verbose_name_plural = "Food Login Details"
 admin.site.register(food_login,foodcourtLoginAdmin)
+
+from django.contrib import admin
+from .models import Offer
+
+class OfferAdmin(admin.ModelAdmin):
+    list_display = ('name', 'discount_percentage','count_adult','count_child', 'active')
+
+admin.site.register(Offer, OfferAdmin)

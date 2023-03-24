@@ -30,30 +30,45 @@ def index(request):
     product = Product.objects.all()
     categories = Category.objects.all()
     itms = item.objects.all()
-    data = {'product':product, 'categories':categories,'itms':itms}
+    food1=fooditem.objects.all()
+    food2=foodCategory.objects.all()
+    food3=Product.objects.all()
+    data = {'product':product, 'categories':categories,'itms':itms ,'food1':food1,'food2':food2,'food3':food3}
     return render(request, 'index.html', data)
 
+def indexfood(request):
+    food2=foodCategory.objects.all()
+    food3=Product.objects.all()
+    food1=fooditem.objects.all()
+    data = {'food1':food1,'food2':food2,'food3':food3}
+    return render(request, 'indexfood.html', data)
+
 def showitem(request, iid):
-    itms = item.objects.all()
+    
     its = item.objects.get(pk=iid)
+    food2=foodCategory.objects.all()
+    food3=Product.objects.all()
+    food1=fooditem.objects.all()
     categories = Category.objects.filter(items=its)
     data = {
-        # 'itms':itms,
+        'food1':food1,
+        'food2':food2,
+        'food3':food3,
         'categories':categories
     }
     return render(request, 'index.html',data)
 
-def showcategory(request, cid):
-    categories = Category.objects.all()
-    # obj = Deals.objects.all()
-    cats = Category.objects.get(pk=cid)
-    product = Product.objects.filter(cat=cats)
-    data = {
-        # 'categories':categories,
-        # 'result': obj,
-        'product': product
-    }
-    return render(request, 'index.html', data)
+# def showcategory(request, cid):
+#     categories = Category.objects.all()
+#     # obj = Deals.objects.all()
+#     cats = Category.objects.get(pk=cid)
+#     product = Product.objects.filter(cat=cats)
+#     data = {
+#         # 'categories':categories,
+#         # 'result': obj,
+#         'product': product
+#     }
+#     return render(request, 'index.html', data)
     
 def about(request):
     return render(request,'about.html')
@@ -170,6 +185,7 @@ def foodregistrations(request):
         username = request.POST['username']
         email = request.POST['email']
         phone = request.POST['phone']
+        license=request.POST['license']
         pass1=request.POST['password']
         pass2=request.POST['cpassword']
         passwords=sha256(pass2.encode()).hexdigest()
@@ -180,7 +196,7 @@ def foodregistrations(request):
             log=food_login(user=email,password=passwords)
             log.save()            
             userid=food_login.objects.get(user=email)
-            reg=food_registration(username=username,phone=phone,user_id=userid.user,password=passwords)
+            reg=food_registration(username=username,phone=phone,license=license,user_id=userid.user,password=passwords)
             # user = Account.objects.create_user(username=username, email=email, phone=phone, password=password)
             reg.save()
             messages.success(request, 'need admin approval')
@@ -209,13 +225,11 @@ def foodlogin(request):
             return redirect(foodlogin)
     return render(request,'foodlogin.html')        
 
-
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def foodlogout(request):
     if 'email' in request.session:
         request.session.flush()
     return redirect(foodlogin)    
-
 
 def foodadd(request):
     if 'email' in request.session:
@@ -232,7 +246,6 @@ def foodadd(request):
             return render(request, 'foodadd.html')
     return redirect(dashboard)    
 
-
 def food_dis(request):
     if 'email' in request.session:
         data=fooditem.objects.all()
@@ -247,7 +260,6 @@ def Delete(request,id):
         messages.info(request,"Deleted")
         return redirect(food_dis)        
     return redirect(dashboard)    
-
 
 def edit_food_item(request, pk):
     if 'email' in request.session:
@@ -266,7 +278,6 @@ def edit_food_item(request, pk):
             return render(request, 'edit_food_item.html', {'item': item}) 
     return redirect(dashboard)
 
-
 def add_food_category(request):
     if 'email' in request.session:
         if request.method == 'POST':
@@ -283,7 +294,6 @@ def add_food_category(request):
         return render(request, 'add_food_category.html', {'items': items})   
     return redirect(dashboard)
     
-
 def edit_food_category(request, pk):    
     if 'email' in request.session:
         category = get_object_or_404(foodCategory, pk=pk)
@@ -339,14 +349,28 @@ def delete_food_category(request,id):
 #booking
 
 import razorpay
+from datetime import datetime
 
-@login_required
+@login_required(login_url='viewlogin')
 def booking(request):
     if request.method == 'POST':
         user = request.user
         p1_id = request.POST.get('p1_id')
         p2_id = request.POST.get('p2_id')
         date = request.POST.get('date')
+        booking_date = datetime.strptime(date, '%Y-%m-%d')
+
+        # Set season based on month of booking date
+        month = booking_date.month
+        if month in [12, 1, 2]:
+            season = 'Winter'
+        elif month in [3, 4, 5]:
+            season = 'Spring'
+        elif month in [6, 7, 8]:
+            season = 'Summer'
+        else:
+            season = 'Fall'
+        print(season)    
         count_adult = int(request.POST.get('count1', 1))
         count_child = int(request.POST.get('count2', 0))
 
@@ -364,20 +388,60 @@ def booking(request):
             return redirect('booking')
 
         total_price = (count_adult * p1.price) + (count_child * p2.price)
-        booking = Book.objects.create(user=user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child, total_price=total_price)
+        food_options = Product.objects.all()
+
+        if request.POST.get('food_option'):
+            # If a food option is selected, add its price to the total price
+            food_price = float(request.POST.get('food_option'))
+            total_price += food_price
+            food_option = Product.objects.get(price=food_price)
+        else:
+            food_price = 0
+            food_option = None
+        booking = Book.objects.create(user=user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child, total_price=total_price,season=season)
+        # ordered_booking = Placed_Booking.objects.create(user=booking.user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child)
+
+        # ordered_booking.save()
         messages.success(request, 'Booking successful.')
         return redirect('checkout', booking.id)
     
     # Get all available packages for the form
+
     adult_packages = Adultpackage.objects.all()
     child_packages = Childpackage.objects.all()
+    food_options = Product.objects.all()
 
-    return render(request, 'booking.html', {'adult_packages': adult_packages, 'child_packages': child_packages})
-    
+    return render(request, 'booking.html', {'adult_packages': adult_packages, 'child_packages': child_packages,'food_options': food_options})
+
+from django.db.models import Q
+
+@login_required(login_url='viewlogin') 
 def checkout(request, booking_id):
-    
- 
         latest_booking = Book.objects.get(id=booking_id)
+        active_offers = Offer.objects.filter(active=True)
+        eligible_offers = []
+        for offer in active_offers:
+            if offer.count_adult is not None and latest_booking.count_adult >= offer.count_adult:
+                adult_offers = active_offers.filter(count_adult__lte=latest_booking.count_adult)
+                for adult_offer in adult_offers:
+                    if adult_offer not in eligible_offers:
+                        eligible_offers.append(adult_offer)
+            if offer.count_child is not None and latest_booking.count_child >= offer.count_child:
+                child_offers = active_offers.filter(count_child__lte=latest_booking.count_child)
+                for child_offer in child_offers:
+                    if child_offer not in eligible_offers:
+                        eligible_offers.append(child_offer)
+
+
+        for offer in eligible_offers:
+            discount = (latest_booking.total_price * offer.discount_percentage) / 100
+            latest_booking.total_price -= discount
+        context = {
+            'latest_booking': latest_booking,
+            'eligible_offers': eligible_offers,
+        }
+        latest_booking.total_price = int(latest_booking.total_price)
+
         client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET_KEY))
         data = {
             'amount': latest_booking.total_price * 100,  # Convert to paise
@@ -387,10 +451,9 @@ def checkout(request, booking_id):
         }
         order = client.order.create(data=data)
         order_id = order['id']
+        print(order_id)
         request.session['order_id'] = order_id
         request.session['booking_id'] = booking_id
-        
-        razorpay_payment_id = request.GET.get('razorpay_payment_id')
         order_status = order['status']
         if order_status == 'created':
             payment = Payments.objects.create(
@@ -398,41 +461,46 @@ def checkout(request, booking_id):
                 amount=latest_booking.total_price,
                 razorpay_order_id=order_id,
                 razorpay_payment_status=order_status,
-                # razorpay_payment_id = razorpay_payment_id,
-                paid=False
+                
             )
             latest_booking.payment = payment
             latest_booking.save()
-            # return redirect(request,'success.html')
+            # return render(request,'success.html')
+        context = {
+        'latest_booking': latest_booking,
+        'eligible_offers': eligible_offers,
+        'order_id': order_id
+         }
 
-        return render(request, 'checkout.html', {'latest_booking': latest_booking, 'order_id': order_id})
+        return render(request, 'checkout.html',context )
 
 
-
+@login_required(login_url='login')
 def paymentdone(request):
-    order_id=request.GET.get('razorpay_order_id')
-    # payment_id=request.POST.get('razorpay_payment_id')
-    print(order_id)
-    # print(payment_id)
-    user=request.user   
-    try:
-        payment=Payments.objects.get(razorpay_order_id=order_id)
-    except Payments.DoesNotExist:
-        return HttpResponse("Payment does not exist for the given order ID") 
-    payment.paid=True
-    # payment.razorpay_payment_id=payment_id
-    payment.save()   
-    booking=Book.objects.get(id=request.session['booking_id'])
-    Placed_Booking.objects.create(
-        user=user,
-        p1_id=booking.p1_id,
-        p2_id=booking.p2_id,
-        date=booking.date,
-        payment=payment
-    )
-    booking.delete()
-    return redirect('index')
-
+    urls=request.META.get('HTTP_REFERER')
+    payment=''
+    if request.GET.get('payment_id') :
+        payment_id = request.GET.get('payment_id', None)
+        print(payment_id)
+        payment=Payments.objects.get(razorpay_order_id=request.session['order_id'])
+        payment.razorpay_payment_id=payment_id
+        payment.paid=True
+        payment.save()
+        booking_id = request.session['booking_id']
+        booking = Book.objects.get(id=booking_id)
+        ordered_booking=Placed_Booking.objects.create(
+            user=booking.user,
+            p1_id=booking.p1_id,
+            p2_id=booking.p2_id,
+            date=booking.date,
+            count_adult=booking.count_adult,
+            count_child=booking.count_child,
+            total_price=booking.total_price,
+            paid=True
+        )
+        ordered_booking.save()
+        return render(request,'paymentdone.html')
+    return redirect(booking)
 
 
 def item_add(request):
@@ -460,12 +528,14 @@ def item_add(request):
             return render(request, 'item_add.html', {'obj':obj, 'items': categories})
     return redirect(dashboard)
 
+
 def item_view(request):
     if 'email' in request.session:
         data=Product.objects.all()
         context={'data': data}
         return render(request,'item_view.html',context)
     return redirect(dashboard)
+
 
 def delete_item_view(request,id):
     if 'email' in request.session:
@@ -497,3 +567,4 @@ def edit_item(request, pk):
     else:
         categories = foodCategory.objects.all()
         return render(request, 'edit_item.html', {'product': product, 'categories': categories})
+

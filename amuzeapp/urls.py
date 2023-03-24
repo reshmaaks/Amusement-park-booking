@@ -18,7 +18,7 @@ urlpatterns = [
     path('logout/',views.logout,name='logout'),
     path('change_password/', views.change_password, name='change_password'),
     path('item/<int:iid>/', views.showitem, name='item'),
-    path('category/<int:cid>/', views.showcategory, name='category'),
+    # path('category/<int:cid>/', views.showcategory, name='category'),
     path('foodlogin/',views.foodlogin,name='foodlogin'),
     path('foodregistrations/',views.foodregistrations,name='foodregistrations'),
     path('dashboard/',views.dashboard,name='dashboard'),
@@ -38,6 +38,8 @@ urlpatterns = [
     path('item_view/', views.item_view, name='item_view'),
     path('delete_item_view/<int:id>/',views.delete_item_view,name='delete_item_view'),
     path('edit_item/<int:pk>/', views.edit_item, name='edit_item'),
+    path('indexfood/', views.indexfood, name='indexfood'),
+
 
 
 

@@ -120,8 +120,105 @@
 		.btn-book:hover {
 			background-color: #0062cc;
 		}
-        
-	</style>
+		.meal-container {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			margin-bottom: 10px;
+			
+			
+		}
+		.meal-container + .meal-container {
+			margin-left: 50px;
+			/* increase this value to increase the distance */
+		}
+		.meal-img {
+			width: 100px;
+			height: 100px;
+			object-fit: cover;
+			margin-right: 20px;
+		}
+		.meal-details {
+			display: flex;
+			flex-direction: column;
+			flex-grow: 1;
+		}
+		.meal-name {
+			font-size: 15px;
+			font-weight: bold;
+			margin-bottom: 10px;
+		}
+		.meal-description {
+			font-size: 16px;
+			margin-bottom: 10px;
+		}
+		.meal-price {
+			font-size: 10px;
+			font-weight: bold;
+			margin-bottom: 10px;
+		}
+		.count-container {
+			display: flex;
+			align-items: center;
+			margin-left: 10px;
+		}
+		.count-box {
+			width: 20px;
+			height: 20px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-size: 18px;
+			font-weight: bold;
+			margin: 0 10px;
+		}
+		.count-btn {
+			background-color: #eee;
+			border: none;
+			width: 25px;
+			height: 25px;
+			font-size: 18px;
+			font-weight: bold;
+			cursor: pointer;
+		}
+		.count-btn:hover {
+			background-color: #ddd;
+		}
+		.count-btn:active {
+			background-color: #ccc;
+		}  .scroll-container {
+				width: 100%;
+				height: 150px; /* adjust height as needed */
+				overflow-x: auto;
+				overflow-y: hidden;
+			}
+			
+			.scroll-row {
+				display: flex;
+				flex-wrap: nowrap;
+			}
+			
+			::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+		}
+
+		::-webkit-scrollbar-track {
+		background-color: transparent;
+		}
+
+		::-webkit-scrollbar-thumb {
+		background-color: #ccc;
+		border-radius: 5px;
+		background-image: url('/static/images/f5.jpg');
+		background-repeat: no-repeat;
+		background-position: center;
+		}
+
+		::-webkit-scrollbar-thumb:hover {
+		background-color: #aaa;
+		}
+</style>
 </head>
 <body style="background-image:url('../static/images/x2.jpg');">
 
@@ -131,7 +228,7 @@
 		<div class="col-md-8 offset-md-2 booking-form">
 			<h2>				Booking Form</h2>
 			<form   action="{% url 'booking' %}" method="POST">
-                {% include 'alert.html' %}  
+         
 				{% csrf_token %}
 				<div class="form-group">
 					<label for="date">Select Date:</label>
@@ -144,7 +241,7 @@
                         <option value="" selected disabled>Select Adult Package</option> <!-- Default "Select" option -->
                         {% if adult_packages %}
                             {% for package in adult_packages %}
-                                <option value="{{ package.p1_id }}" data-price="{{ package.price }}">{{ package.name }} - ${{ package.price }}</option>
+                                <option value="{{ package.p1_id }}" data-price="{{ package.price }}">{{ package.name }} - ₹{{ package.price }}</option>
                             {% endfor %}
                         {% else %}
                             <option value="" disabled>No adult packages available</option>
@@ -180,10 +277,54 @@
 				<input type="text" id="children" name="count2" value="0">
 				<button id="plus-btn-children" type="button">+</button>
 			</div><br>
+			<div class="scroll-container">
+				<div class="scroll-row">
+					{% for food in food_options %}
+
+			<div class="meal-container">
+				
+
+				<img class="meal-img" src="/media/{{food.product_image}}" alt="Meal Image">
+				<div class="meal-details">
+				  <div class="meal-name">{{ food.name }}</div>
+				  
+				  <div class="meal-price">{{ food.selling_price }}</div>
+				
+				<div class="count-container">
+				  <button class="count-btn minus-btn">-</button>
+				  <div class="count-box">0</div>
+				  <button class="count-btn plus-btn">+</button>
+				  
+				</div>
+				
+			</div>
+		</div>
+		{% endfor %}
+
+				</div>
+			</div>
+			<br>
+				  <script>
+					const minusBtn = document.querySelector('.minus-btn');
+					const plusBtn = document.querySelector('.plus-btn');
+					const countBox = document.querySelector('.count-box');
+					let count = 0;
+					minusBtn.addEventListener('click', () => {
+					  count = count > 0 ? count - 1 : 0;
+					  countBox.textContent = count;
+					});
+					plusBtn.addEventListener('click', () => {
+					  count += 1;
+					  countBox.textContent = count;
+					});
+				  </script>
+				
+				
             <div>
             <label for="total total_price">Total Amount :</label>
             <input type="text" name="total_price" id="total-price" value="" readonly>
         </div><br>
+	
             <script>
                 function updateTotalPrice() {
                 var adultPackageId = document.getElementById("adult-package").value;

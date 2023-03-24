@@ -85,6 +85,8 @@ class food_login(models.Model):
 class food_registration(models.Model):
     username = models.CharField(max_length=200)
     phone = models.CharField(max_length=200)
+    license=models.CharField(max_length=200,unique=True,null=True)
+
     user = models.ForeignKey(food_login, on_delete=models.SET_NULL, blank=True, null=True)
     password = models.CharField(max_length=100)
     def __str__(self):
@@ -107,12 +109,6 @@ class Category(models.Model):
 
     def __str__(self):
         return self.title
-
-
-
-
-
-
 
 class fooditem(models.Model):
     brandname = models.CharField(max_length=200, unique=True)
@@ -182,7 +178,7 @@ class Payments(models.Model):
     amount = models.CharField(max_length=100)
     razorpay_order_id = models.CharField(max_length=100, blank=True)
     razorpay_payment_status=models.CharField(max_length=100, blank=True)
-    # razorpay_payment_id = models.CharField(max_length=100, blank=True,null=True)
+    razorpay_payment_id = models.CharField(max_length=100, blank=True,null=True)
     paid = models.BooleanField(default=False)  
     def __str__(self):
         return self.user      
@@ -192,13 +188,24 @@ class Placed_Booking(models.Model):
     p1_id=models.ForeignKey(Adultpackage,on_delete=models.CASCADE,null=True,blank=True)
     p2_id=models.ForeignKey(Childpackage,on_delete=models.CASCADE,null=True,blank=True)
     date = models.DateField(auto_now_add=True)
-    payment=models.ForeignKey(Payments,on_delete=models.CASCADE,default="")
+    count_adult=models.BigIntegerField(default=1)
+    count_child=models.BigIntegerField(default=1,null=True)
+    total_price=models.BigIntegerField(default=0)
+    paid = models.BooleanField(default=False, null=True)
     def __str__(self):
         return self.user
 
 
 
 class Book(models.Model):
+    SEASON_CHOICES = [
+    ('Winter', 'Winter'),
+    ('Spring', 'Spring'),
+    ('Summer', 'Summer'),
+    ('Fall', 'Fall')
+    ]
+
+    season = models.CharField(max_length=20, choices=SEASON_CHOICES, null=True, blank=True)
     user =models.ForeignKey(Account, on_delete=models.SET_NULL,null=True)
     p1_id=models.ForeignKey(Adultpackage,on_delete=models.CASCADE,null=True,blank=True)
     p2_id=models.ForeignKey(Childpackage,on_delete=models.CASCADE,null=True,blank=True)
@@ -206,9 +213,26 @@ class Book(models.Model):
     count_adult=models.BigIntegerField(default=1)
     count_child=models.BigIntegerField(default=1,null=True)
     total_price=models.BigIntegerField(default=0)
+    discount_price = models.DecimalField(max_digits=10, decimal_places=2, default=0,null=True)
+    # number_of_offers = models.PositiveIntegerField(default=0,null= True)
+    applied_offers = models.IntegerField(default=0,null= True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     # child_count=models.PositiveIntegerField(default=1)
     # meals_name=models.ForeignKey(package,on_delete=models.CASCADE)
     def __str__(self):
-        return str(self.user)        
+        return str(self.user) 
+               
+
+
+    
+class Offer(models.Model):
+    name = models.CharField(max_length=255)
+    discount_percentage = models.IntegerField()
+    active = models.BooleanField(default=True)
+    count_adult = models.PositiveIntegerField(null=True)
+    count_child = models.PositiveIntegerField(null=True)
+
+    def __str__(self):
+        return self.name
+
