@@ -129,7 +129,7 @@
 			
 		}
 		.meal-container + .meal-container {
-			margin-left: 50px;
+			margin-left: 150%;
 			/* increase this value to increase the distance */
 		}
 		.meal-img {
@@ -149,7 +149,7 @@
 			margin-bottom: 10px;
 		}
 		.meal-description {
-			font-size: 16px;
+			font-size: 12px;
 			margin-bottom: 10px;
 		}
 		.meal-price {
@@ -172,23 +172,23 @@
 			font-weight: bold;
 			margin: 0 10px;
 		}
-		.count-btn {
+		.count-btn1 {
 			background-color: #eee;
 			border: none;
 			width: 25px;
 			height: 25px;
 			font-size: 18px;
 			font-weight: bold;
-			cursor: pointer;
+			/* cursor: pointer; */
 		}
-		.count-btn:hover {
+		.count-btn1:hover {
 			background-color: #ddd;
 		}
-		.count-btn:active {
+		.count-btn1:active {
 			background-color: #ccc;
 		}  .scroll-container {
 				width: 100%;
-				height: 150px; /* adjust height as needed */
+				height: 200px; /* adjust height as needed */
 				overflow-x: auto;
 				overflow-y: hidden;
 			}
@@ -227,7 +227,7 @@
 	<div class="row">
 		<div class="col-md-8 offset-md-2 booking-form">
 			<h2>				Booking Form</h2>
-			<form   action="{% url 'booking' %}" method="POST">
+			<form   action="{% url 'booking' %}" method="POST" >
          
 				{% csrf_token %}
 				<div class="form-group">
@@ -277,77 +277,145 @@
 				<input type="text" id="children" name="count2" value="0">
 				<button id="plus-btn-children" type="button">+</button>
 			</div><br>
-			<div class="scroll-container">
-				<div class="scroll-row">
-					{% for food in food_options %}
+				<div class="scroll-container">
+					<div class="scroll-row">
+						{% for food in food_options %}
+						<div class="meal-selection">
+							<input type="checkbox" id="food_select_{{ food.id }}" name="food_select" value="{{ food.id }}">
+							<label class="meal-name" for="food_select_{{ food.id }}">{{ food.name }}</label>
+						<div class="meal-container">
+							
+							<img class="meal-img" src="/media/{{food.product_image}}" alt="Meal Image">
+							<div class="meal-details">
+								<div class="meal-name"></div>
+								<div class="meal-description">{{ food.brand }}</div>
+								<div class="meal-description">{{ food.cat }}</div>
+								<div class="meal-price" data-price="{{ food.selling_price }}" >₹{{ food.selling_price }}</div>
+								<div class="count-container">
+									<button type="button" class="count-btn1 minus-btn" data-id="{{ food.id }}" data-name="{{ food.name }}">-</button>
+									<div class="count-box">0</div>
+									<button type="button" class="count-btn1 plus-btn" data-id="{{ food.id }}" data-name="{{ food.name }}">+</button>
+									<input type="hidden" name="food_count_{{ food.id }}" id="food_count_{{ food.id }}" value="0">
+								  </div>
+								
+								</div>
+							</div>
+						</div>
+						<p style="color: #fff;">..........</p>
 
-			<div class="meal-container">
-				
+						{% endfor %}
+						
 
-				<img class="meal-img" src="/media/{{food.product_image}}" alt="Meal Image">
-				<div class="meal-details">
-				  <div class="meal-name">{{ food.name }}</div>
-				  
-				  <div class="meal-price">{{ food.selling_price }}</div>
-				
-				<div class="count-container">
-				  <button class="count-btn minus-btn">-</button>
-				  <div class="count-box">0</div>
-				  <button class="count-btn plus-btn">+</button>
-				  
+					</div>
 				</div>
-				
-			</div>
-		</div>
-		{% endfor %}
+            
+				<script>
+					$(document).on('click', '.plus-btn', function(e) {
+						e.preventDefault();
+						var food_id = $(this).data('id');
+						var food_name = $(this).data('name');
+						var food_price = parseFloat($(this).closest('.meal-details').find('.meal-price').data('price'));
+						var count_box = $(this).siblings('.count-box');
+						var count = parseInt(count_box.text());
+						count_box.text(count);
+						var food_count_field = $('#food_count_' + food_id);
+						food_count_field.val(count);
+						var total_price_field = $('#total_price');
+						var total_price = parseFloat(total_price_field.val());
+						total_price += food_price;
+						total_price_field.val(total_price);
+						var selected_food_list = $('#selected_food_list');
+						var selected_food_item = $('<li>').text(food_name + ': ' + count);
+						selected_food_list.append(selected_food_item);
+					});
 
-				</div>
-			</div>
+						$(document).on('click', '.minus-btn', function(e) {
+							e.preventDefault();
+							var food_id = $(this).data('id');
+							var food_name = $(this).data('name');
+							var food_price = parseFloat($(this).closest('.meal-details').find('.meal-price').data('price'));
+							var count_box = $(this).siblings('.count-box');
+							var count = parseInt(count_box.text());
+							if (count > 0) {
+								count -= 1;
+								count_box.text(count+1);
+								var food_count_field = $('#food_count_' + food_id);
+								food_count_field.val(count+1);
+								var total_price_field = $('#total_price');
+								var total_price = parseFloat(total_price_field.val());
+								total_price -= food_price;
+								total_price_field.val(total_price);
+								var selected_food_list = $('#selected_food_list');
+								var selected_food_item = $('<li>').text(food_name + ': ' + count+1);
+								selected_food_list.append(selected_food_item);
+							}
+						});
+						</script>
+
+			
+			
 			<br>
-				  <script>
-					const minusBtn = document.querySelector('.minus-btn');
-					const plusBtn = document.querySelector('.plus-btn');
-					const countBox = document.querySelector('.count-box');
-					let count = 0;
-					minusBtn.addEventListener('click', () => {
-					  count = count > 0 ? count - 1 : 0;
-					  countBox.textContent = count;
-					});
-					plusBtn.addEventListener('click', () => {
-					  count += 1;
-					  countBox.textContent = count;
-					});
-				  </script>
-				
-				
             <div>
+				
             <label for="total total_price">Total Amount :</label>
             <input type="text" name="total_price" id="total-price" value="" readonly>
         </div><br>
-	
-            <script>
-                function updateTotalPrice() {
-                var adultPackageId = document.getElementById("adult-package").value;
-                var adultPackagePrice = document.getElementById("adult-package").options[document.getElementById("adult-package").selectedIndex].getAttribute("data-price");
-                var adultPackageCount = parseInt(document.getElementById("adults").value);
+	    <button type="submit" class="btn btn-book">Continue</button>
+		<script>
+			function updateTotalPrice() {
+				var adultPackagePrice = document.getElementById("adult-package").options[document.getElementById("adult-package").selectedIndex].getAttribute("data-price");
+				var adultPackageCount = parseInt(document.getElementById("adults").value);
 
-                var childPackageId = document.getElementById("child-package").value;
-                var childPackagePrice = document.getElementById("child-package").options[document.getElementById("child-package").selectedIndex].getAttribute("data-price");
-                var childPackageCount = parseInt(document.getElementById("children").value);
+				var childPackagePrice = document.getElementById("child-package").options[document.getElementById("child-package").selectedIndex].getAttribute("data-price");
+				var childPackageCount = parseInt(document.getElementById("children").value);
 
-                var totalPrice = (adultPackagePrice * adultPackageCount) + (childPackagePrice * childPackageCount);
-                document.getElementById("total-price").value = totalPrice;
-                
-                document.getElementById("adults").value = adultPackageCount;
-                document.getElementById("children").value = childPackageCount;
-            }
+				var mealContainers = document.getElementsByClassName("meal-container");
+				var totalMealPrice = 0;
+				for (var i = 0; i < mealContainers.length; i++) {
+					var mealPrice = parseFloat(mealContainers[i].getElementsByClassName("meal-price")[0].innerText.replace("₹", ""));
+					var mealCount = parseInt(mealContainers[i].getElementsByClassName("count-box")[0].innerText);
+					totalMealPrice += mealPrice * mealCount;
+				}
 
-                document.getElementById("adult-package").addEventListener("change", updateTotalPrice);
-                document.getElementById("adults").addEventListener("change", updateTotalPrice);
-                document.getElementById("child-package").addEventListener("change", updateTotalPrice);
-                document.getElementById("children").addEventListener("change", updateTotalPrice);
-            </script>
-            <button type="submit" class="btn btn-book">Continue</button>
+				var totalPrice = (adultPackagePrice * adultPackageCount) + (childPackagePrice * childPackageCount) + totalMealPrice;
+				document.getElementById("total-price").value = totalPrice;
+		
+				document.getElementById("adults").value = adultPackageCount;
+				document.getElementById("children").value = childPackageCount;
+			}
+		
+			document.getElementById("adult-package").addEventListener("change", updateTotalPrice);
+			document.getElementById("adults").addEventListener("change", updateTotalPrice);
+			document.getElementById("child-package").addEventListener("change", updateTotalPrice);
+			document.getElementById("children").addEventListener("change", updateTotalPrice);
+		
+			var plusButtons = document.querySelectorAll('.plus-btn');
+			var minusButtons = document.querySelectorAll('.minus-btn');
+		
+			plusButtons.forEach(function(button) {
+				button.addEventListener('click', function() {
+					var countBox = this.parentNode.querySelector('.count-box');
+					var count = parseInt(countBox.textContent);
+		
+					countBox.textContent = count + 1;
+					updateTotalPrice();
+				});
+			});
+		
+			minusButtons.forEach(function(button) {
+				button.addEventListener('click', function() {
+					var countBox = this.parentNode.querySelector('.count-box');
+					var count = parseInt(countBox.textContent);
+		
+					if (count > 0) {
+						countBox.textContent = count - 1;
+						updateTotalPrice();
+					}
+				});
+			});
+		</script>
+		
+            
 			</form>
 
 
@@ -388,31 +456,31 @@ document.getElementById("minus-btn-children").addEventListener("click", function
     }
 });
 
-            const dateInput = document.getElementById('date');
+        // const dateInput = document.getElementById('date');
 
-        // Get the current date
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+        // // Get the current date
+        // const today = new Date();
+        // today.setHours(0, 0, 0, 0);
+        // const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
 
-        // Add a change event listener to the date input
-        dateInput.addEventListener('change', () => {
-        // Get the selected date
-        const selectedDate = new Date(dateInput.value);
+        // // Add a change event listener to the date input
+        // dateInput.addEventListener('change', () => {
+        // // Get the selected date
+        // const selectedDate = new Date(dateInput.value);
 
-        // Check if the selected date is valid
-        if (selectedDate < tomorrow) {
-            // Display an error message
-            const dateError = document.getElementById('date-error');
-            dateError.classList.remove('d-none');
-            dateInput.setCustomValidity('Please select a date from tomorrow onwards.');
-        } else {
-            // Hide the error message
-            const dateError = document.getElementById('date-error');
-            dateError.classList.add('d-none');
-            dateInput.setCustomValidity('');
-        }
-        });
+        // // Check if the selected date is valid
+        // if (selectedDate < tomorrow) {
+        //     // Display an error message
+        //     const dateError = document.getElementById('date-error');
+        //     dateError.classList.remove('d-none');
+        //     dateInput.setCustomValidity('Please select a date from tomorrow onwards.');
+        // } else {
+        //     // Hide the error message
+        //     const dateError = document.getElementById('date-error');
+        //     dateError.classList.add('d-none');
+        //     dateInput.setCustomValidity('');
+        // }
+        // });
 
 	$(document).ready(function() {
 		$('.select2').select2();
@@ -447,12 +515,12 @@ document.getElementById("minus-btn-children").addEventListener("click", function
 			});
 		});
 
-		flatpickr('#date', {
-			enableTime: false,
-			dateFormat: 'Y-m-d',
-			minDate: 'today',
-			maxDate: new Date().fp_incr(30)
-		});
+		// flatpickr('#date', {
+		// 	enableTime: false,
+		// 	dateFormat: 'Y-m-d',
+		// 	minDate: 'today',
+		// 	maxDate: new Date().fp_incr(30)
+		// });
 	});
     var options = {
                   "key": "rzp_test_d7pbnQ23YtrZat", // Enter the Key ID generated from the Dashboard

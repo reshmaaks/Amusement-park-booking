@@ -132,19 +132,21 @@
 		<label for="date">Date:</label>
 		<input type="text" id="date" name="date" value="{{latest_booking.date}}" readonly>
 		<div class="select-package">
-			<label for="adult-package">Adult Package:</label>
-		<input type="text" id="date" name="date" value="{{latest_booking.p1_id.name}}" readonly>
+			<label for="adult-package">Adult Package: </label>
+		<input type="text" id="date" name="date" value="{{latest_booking.p1_id.name}} : {{latest_booking.count_adult}}" readonly>
 			
 			<label for="child-package">Child Package:</label>
-		<input type="text" id="date" name="date" value="{{latest_booking.p2_id.name}}" readonly>
+		<input type="text" id="date" name="date" value="{{latest_booking.p2_id.name}} : {{latest_booking.count_child}}" readonly>
 			
 		</div>
-		<div class="select-number">
-			<label for="adult-number">Number of Adults:</label>
-			<input type="number" id="adult-number" name="adult-number" value="{{latest_booking.count_adult}}" min="1" readonly>
-			<label for="child-number">Number of Children:</label>
-			<input type="number" id="child-number" name="child-number" value="{{latest_booking.count_child}}" min="0" readonly>
+
+		<div class="select-package">
+		{% for i in booking_food_options %}
+			<label for="adult-package">Food Items: </label>
+		<input type="text" id="date" name="date" value="{{i.food_option.name}} : {{i.count}}" readonly>
+		{% endfor %}
 		</div>
+
 		<div class="applied-offers">
 			<p id="offer-title">Offer Applied </p>
 			<ul id="offer-details" style="display:none;">
@@ -200,7 +202,8 @@
 		
 			var form = document.getElementById["myform"];
 				var a = response.razorpay_payment_id;
-				window.location.href = `http://127.0.0.1:8000/paymentdone?payment_id=`+a
+				window.location.href = `http://127.0.0.1:8000/paymentdone?signature=${response.razorpay_signature}&payment_id=`+a
+				
 			  
 		  },
 		  "prefill": {

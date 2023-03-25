@@ -160,7 +160,7 @@ def viewlogin(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def logout(request):
     auth.logout(request)
-    return redirect('viewlogin')   
+    return redirect('index')   
 
 def change_password(request):
     if request.method == 'POST':
@@ -229,7 +229,7 @@ def foodlogin(request):
 def foodlogout(request):
     if 'email' in request.session:
         request.session.flush()
-    return redirect(foodlogin)    
+    return redirect(index)    
 
 def foodadd(request):
     if 'email' in request.session:
@@ -359,8 +359,6 @@ def booking(request):
         p2_id = request.POST.get('p2_id')
         date = request.POST.get('date')
         booking_date = datetime.strptime(date, '%Y-%m-%d')
-
-        # Set season based on month of booking date
         month = booking_date.month
         if month in [12, 1, 2]:
             season = 'Winter'
@@ -373,7 +371,6 @@ def booking(request):
         print(season)    
         count_adult = int(request.POST.get('count1', 1))
         count_child = int(request.POST.get('count2', 0))
-
         try:
             p1 = Adultpackage.objects.get(p1_id=p1_id)
         except Adultpackage.DoesNotExist:
@@ -382,97 +379,100 @@ def booking(request):
             p2 = Childpackage.objects.get(p2_id=p2_id)
         except Childpackage.DoesNotExist:
             p2 = None
-
         if p1 is None:
             messages.error(request, 'Invalid package selected.')
             return redirect('booking')
-
+        food_options = Product.objects.all()   
         total_price = (count_adult * p1.price) + (count_child * p2.price)
-        food_options = Product.objects.all()
-
-        if request.POST.get('food_option'):
-            # If a food option is selected, add its price to the total price
-            food_price = float(request.POST.get('food_option'))
-            total_price += food_price
-            food_option = Product.objects.get(price=food_price)
-        else:
-            food_price = 0
-            food_option = None
         booking = Book.objects.create(user=user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child, total_price=total_price,season=season)
         # ordered_booking = Placed_Booking.objects.create(user=booking.user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child)
-
         # ordered_booking.save()
+        food_selected = False
+        for food in Product.objects.all():
+            print(1)
+            count = int(request.POST.get(f'food_count_{food.id}', 0))
+            print(count)
+            if count > 0:
+                print(3)
+                BookingFoodOption.objects.create(booking=booking, food_option=food, count=count)
+                food_selected = True
+                print(user,booking, food, count)
+        if food_selected:
+            booking.food = True
+            booking.save()        
         messages.success(request, 'Booking successful.')
         return redirect('checkout', booking.id)
-    
-    # Get all available packages for the form
-
     adult_packages = Adultpackage.objects.all()
     child_packages = Childpackage.objects.all()
     food_options = Product.objects.all()
-
     return render(request, 'booking.html', {'adult_packages': adult_packages, 'child_packages': child_packages,'food_options': food_options})
 
 from django.db.models import Q
 
 @login_required(login_url='viewlogin') 
 def checkout(request, booking_id):
-        latest_booking = Book.objects.get(id=booking_id)
-        active_offers = Offer.objects.filter(active=True)
-        eligible_offers = []
-        for offer in active_offers:
-            if offer.count_adult is not None and latest_booking.count_adult >= offer.count_adult:
-                adult_offers = active_offers.filter(count_adult__lte=latest_booking.count_adult)
-                for adult_offer in adult_offers:
-                    if adult_offer not in eligible_offers:
-                        eligible_offers.append(adult_offer)
-            if offer.count_child is not None and latest_booking.count_child >= offer.count_child:
-                child_offers = active_offers.filter(count_child__lte=latest_booking.count_child)
-                for child_offer in child_offers:
-                    if child_offer not in eligible_offers:
-                        eligible_offers.append(child_offer)
+    latest_booking = Book.objects.get(id=booking_id)
+    active_offers = Offer.objects.filter(active=True)
+    booking_food_options = latest_booking.bookingfoodoption_set.all()
+    applied_offers_count = 0
+    eligible_offers = []
+    for offer in active_offers:
+        if offer.count_adult is not None and latest_booking.count_adult >= offer.count_adult:
+            adult_offers = active_offers.filter(count_adult__lte=latest_booking.count_adult)
+            for adult_offer in adult_offers:
+                if adult_offer not in eligible_offers:
+                    eligible_offers.append(adult_offer)
+                    applied_offers_count += 1
+        if offer.count_child is not None and latest_booking.count_child >= offer.count_child:
+            child_offers = active_offers.filter(count_child__lte=latest_booking.count_child)
+            for child_offer in child_offers:
+                if child_offer not in eligible_offers:
+                    eligible_offers.append(child_offer)
+                    applied_offers_count += 1
 
-
+    # Check if the discount has already been applied
+    if 'discount_applied' not in request.session:
         for offer in eligible_offers:
             discount = (latest_booking.total_price * offer.discount_percentage) / 100
             latest_booking.total_price -= discount
-        context = {
-            'latest_booking': latest_booking,
-            'eligible_offers': eligible_offers,
-        }
-        latest_booking.total_price = int(latest_booking.total_price)
+        request.session['discount_applied'] = True
 
-        client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET_KEY))
-        data = {
-            'amount': latest_booking.total_price * 100,  # Convert to paise
-            'currency': 'INR',
-            'receipt': str(latest_booking.id),
-            'payment_capture': 1,
-        }
-        order = client.order.create(data=data)
-        order_id = order['id']
-        print(order_id)
-        request.session['order_id'] = order_id
-        request.session['booking_id'] = booking_id
-        order_status = order['status']
-        if order_status == 'created':
-            payment = Payments.objects.create(
-                user=latest_booking.user,
-                amount=latest_booking.total_price,
-                razorpay_order_id=order_id,
-                razorpay_payment_status=order_status,
-                
-            )
-            latest_booking.payment = payment
-            latest_booking.save()
-            # return render(request,'success.html')
-        context = {
+    latest_booking.applied_offers = applied_offers_count
+    latest_booking.total_price = int(latest_booking.total_price)
+
+    client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET_KEY))
+    data = {
+        'amount': latest_booking.total_price * 100,  # Convert to paise
+        'currency': 'INR',
+        'receipt': str(latest_booking.id),
+        'payment_capture': 1,
+    }
+    order = client.order.create(data=data)
+    order_id = order['id']
+    print(order_id)
+    request.session['order_id'] = order_id
+    request.session['booking_id'] = booking_id
+    order_status = order['status']
+    if order_status == 'created':
+        payment = Payments.objects.create(
+            user=latest_booking.user,
+            amount=latest_booking.total_price,
+            razorpay_order_id=order_id,
+            razorpay_payment_status=order_status,
+        )
+        latest_booking.payment = payment
+        latest_booking.save()
+        # return render(request,'success.html')
+
+    context = {
+        'booking_food_options': booking_food_options,
         'latest_booking': latest_booking,
         'eligible_offers': eligible_offers,
         'order_id': order_id
-         }
+    }
 
-        return render(request, 'checkout.html',context )
+    return render(request, 'checkout.html', context)
+
 
 
 @login_required(login_url='login')
@@ -568,3 +568,18 @@ def edit_item(request, pk):
         categories = foodCategory.objects.all()
         return render(request, 'edit_item.html', {'product': product, 'categories': categories})
 
+from django.utils import timezone
+
+def booked_food(request):
+    today = timezone.now().date() # get today's date in timezone
+    bookings_today = Book.objects.filter(date__exact=today, food=True) # filter only food bookings
+    context = {
+        'booked_today': bookings_today
+    }
+    return render(request, 'booked_food.html', context)
+
+
+def food_details(request, booking_id):
+    booking = Book.objects.get(id=booking_id)
+    food_options = BookingFoodOption.objects.filter(booking=booking)
+    return render(request, 'food_details.html', {'food_options': food_options})

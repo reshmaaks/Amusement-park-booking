@@ -118,7 +118,7 @@ class fooditem(models.Model):
 
 class foodCategory(models.Model):
     title = models.CharField(max_length=200,unique=True)
-    items=models.ForeignKey(fooditem,on_delete=models.CASCADE,null=True)
+    # items=models.ForeignKey(fooditem,on_delete=models.CASCADE,null=True)
     category_image = models.ImageField(upload_to='media/f-photo')
 
     def __str__(self):
@@ -159,7 +159,7 @@ class Childpackage(models.Model):
     def __str__(self):
         return str(self.name)        
         
-class Reviews(models.Model):
+class Review(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, blank=True)
     review = models.CharField(max_length=500, blank=True)
@@ -213,19 +213,21 @@ class Book(models.Model):
     count_adult=models.BigIntegerField(default=1)
     count_child=models.BigIntegerField(default=1,null=True)
     total_price=models.BigIntegerField(default=0)
-    discount_price = models.DecimalField(max_digits=10, decimal_places=2, default=0,null=True)
-    # number_of_offers = models.PositiveIntegerField(default=0,null= True)
+    food = models.BooleanField(default=False,null=True)
     applied_offers = models.IntegerField(default=0,null= True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    # child_count=models.PositiveIntegerField(default=1)
-    # meals_name=models.ForeignKey(package,on_delete=models.CASCADE)
     def __str__(self):
         return str(self.user) 
                
+class BookingFoodOption(models.Model):
+    booking = models.ForeignKey(Book, on_delete=models.CASCADE)
+    food_option = models.ForeignKey(Product, on_delete=models.CASCADE)
+    count = models.PositiveIntegerField(default=0)
+    served = models.BooleanField(default=False) 
+    def __str__(self):
+        return f"{self.count} x {self.food_option.name} ({self.booking.user.username})"
 
 
-    
 class Offer(models.Model):
     name = models.CharField(max_length=255)
     discount_percentage = models.IntegerField()
@@ -234,5 +236,4 @@ class Offer(models.Model):
     count_child = models.PositiveIntegerField(null=True)
 
     def __str__(self):
-        return self.name
-
+        return self.name        

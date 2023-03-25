@@ -1,0 +1,50 @@
+{% extends 'nav.html' %}
+
+
+{% block content %}
+  <h1>Booked Food</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Mail ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for booking in booked_today %}
+        <tr>
+          <td>
+            <a href="{% url 'food_details' booking.id %}">{{ booking.user.email }}</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="2">No bookings for today.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    function servedFood(foodOptionId) {
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'served_food' %}",
+        data: {
+          'food_option_id': foodOptionId,
+          'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+          alert('Food served successfully!');
+        },
+        error: function(response) {
+          alert('Error serving food.');
+        }
+      });
+    }
+  </script>
+{% endblock %}
+
+

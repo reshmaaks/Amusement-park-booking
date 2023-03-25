@@ -30,7 +30,7 @@
 
 			<div class="signup">
 				<form onsubmit ="return nameValidation()  && emailValidation()  && phoneValidation() && passwordValidation() && cpasswordValidation()" action="{% url 'register' %}" method="POST">
-					{% include 'alert.html' %}   
+					
                 	{% csrf_token %}
 					<label for="chk" aria-hidden="true">Sign up</label>
 					

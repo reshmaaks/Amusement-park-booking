@@ -39,6 +39,9 @@ urlpatterns = [
     path('delete_item_view/<int:id>/',views.delete_item_view,name='delete_item_view'),
     path('edit_item/<int:pk>/', views.edit_item, name='edit_item'),
     path('indexfood/', views.indexfood, name='indexfood'),
+    path('booked_food/', views.booked_food, name='booked_food'),
+    path('food_details/<int:booking_id>/', views.food_details, name='food_details'),
+
 
 
 
@@ -56,7 +59,5 @@ urlpatterns = [
 
 
 
-admin.site.site_header="Amusement Park"
-admin.site.site_title="Amusement Park"
-admin.site.site_index_title="welcom to Amusement Park"
+
 

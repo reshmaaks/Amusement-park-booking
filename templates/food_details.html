@@ -1,0 +1,33 @@
+{% extends 'nav.html' %}
+
+{% block content %}
+    <h1>{{ booking.user }}'s Food Details</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Food Name</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for food_option in food_options %}
+                <tr>
+                    <td>{{ food_option.food_option.name }}</td>
+                    <td>{{ food_option.count }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No food options selected.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <td>
+        {% if booking.status == 'served' %}
+            served
+        {% else %}
+            <button>Serve</button>
+        {% endif %}
+    </td>
+{% endblock %}

@@ -5,27 +5,50 @@ from.models import *
 from django.contrib.auth.models import Group
 # Register your models here.
 
+
+
 admin.site.unregister(Group)
-admin.site.register(fooditem)
-admin.site.register(foodCategory)
+
 admin.site.register(Adultpackage)
 admin.site.register(Childpackage)
-admin.site.register(Reviews)
+admin.site.register(Review)
 admin.site.register(Payments)
 admin.site.register(Placed_Booking)
-admin.site.register(Product)
 
+@admin.register(foodCategory)
+class foodCategoryModelAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+@admin.register(fooditem)
+class fooditemModelAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+@admin.register(Product)
+class ProductModelAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
 
-
-# admin.site.register(Category)
-# class food_loginModelAdmin(admin.ModelAdmin):
-#     def has_add_permission(self, request, obj=None):
-#         return False
-#     def has_change_permission(self, request, obj=None):
-#         return False
-#     def has_delete_permission(self, request, obj=None):
-#         return False
-# admin.site.register(food_login)
+@admin.register(BookingFoodOption)
+class BookingFoodOptionModelAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+# admin.site.register(BookingFoodOption)
 
 
 @admin.register(Category)
