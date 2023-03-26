@@ -3,7 +3,7 @@
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from hashlib import sha256
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import *
 from django.contrib import messages
@@ -382,6 +382,12 @@ def booking(request):
         if p1 is None:
             messages.error(request, 'Invalid package selected.')
             return redirect('booking')
+        booking_limit = BookingLimit.objects.first()
+        max_bookings = booking_limit.max_bookings
+        num_bookings_today = Book.objects.filter(date=date).count()
+        if num_bookings_today >= max_bookings:
+            messages.error(request, 'Maximum number of bookings reached for today.')
+            return redirect('booking')    
         food_options = Product.objects.all()   
         total_price = (count_adult * p1.price) + (count_child * p2.price)
         booking = Book.objects.create(user=user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child, total_price=total_price,season=season)
@@ -580,6 +586,128 @@ def booked_food(request):
 
 
 def food_details(request, booking_id):
-    booking = Book.objects.get(id=booking_id)
-    food_options = BookingFoodOption.objects.filter(booking=booking)
-    return render(request, 'food_details.html', {'food_options': food_options})
+    if 'email' in request.session:
+        booking = Book.objects.get(id=booking_id)
+        food_options = BookingFoodOption.objects.filter(booking=booking)
+        return render(request, 'food_details.html', {'food_options': food_options})
+    else:
+        return JsonResponse({'success': False})
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def serve_food_option(request):
+    if 'email' in request.session:
+        booking_food_option_id = request.POST.get('booking_food_option_id')
+        if booking_food_option_id:
+            booking_food_option = get_object_or_404(BookingFoodOption, id=booking_food_option_id)
+            booking_food_option.served = True
+            booking_food_option.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'message': 'Invalid booking food option ID.'})
+    else:
+        return JsonResponse({'success': False, 'message': 'User is not authenticated.'})
+@login_required
+
+def food_option_display(request):
+    if 'email' in request.session:
+        booking_food_options = BookingFoodOption.objects.all()
+        return render(request, 'food_option_display.html', {'booking_food_options': booking_food_options})
+    else:
+        return redirect('login')
+
+
+#prediction
+from django.shortcuts import render
+import pandas as pd
+import pickle
+from sklearn.linear_model import LinearRegression
+
+
+csv_path = r'C:\Users\lenovo\predictions\predict\amusement_park_data.csv'
+# Load the amusement park dataset
+df = pd.read_csv(csv_path)
+
+# Convert categorical variables to numerical variables
+df = pd.get_dummies(df, columns=['Season'])
+
+# Train a linear regression model on the dataset
+X = df.drop('Num_Customers', axis=1)
+y = df['Num_Customers']
+model = LinearRegression()
+model.fit(X, y)
+
+def home(request):
+    if request.method == 'POST':
+        # Get the form data
+        season = request.POST['season']
+        offers = request.POST['offers']
+        
+        # Convert the categorical variable to numerical variable
+        if season == 'Spring':
+            season_spring = 1
+            season_summer = 0
+            season_fall = 0
+            season_winter = 0
+        elif season == 'Summer':
+            season_spring = 0
+            season_summer = 1
+            season_fall = 0
+            season_winter = 0
+        elif season == 'Fall':
+            season_spring = 0
+            season_summer = 0
+            season_fall = 1
+            season_winter = 0
+        else:
+            season_spring = 0
+            season_summer = 0
+            season_fall = 0
+            season_winter = 1
+        
+        # Make a prediction using the trained model
+        prediction = round(model.predict([[season_spring, season_summer, season_fall, season_winter, offers]])[0],)
+        
+        # Render the result template with the prediction
+        return render(request, 'result.html', {'season':season ,'offers':offers,'prediction': prediction})
+        
+    else:
+        # Render the home template
+        return render(request, 'home.html')
+def result(request,prediction):
+    return render(request, 'home.html', {'prediction': prediction})        
+    
+
+# from django.http import HttpResponse
+# from django.template.loader import get_template
+# from django.conf import settings
+# from io import BytesIO
+# from .utils import TicketPDF
+# def download_ticket(request):
+#     booking = Book.objects.first()  # Get the first booking instance
+#     adult_count = booking.count_adult
+#     child_count = booking.count_child
+#     Package_Adult = booking.p1_id
+#     Package_Child = booking.p2_id
+
+#     # ticket_type = 'Adult' if booking.p1_id == 'A' else 'Child'
+#     date = booking.date
+#     total_price = booking.total_price
+
+#     ticket_details = {
+#         'Package_Adult': Package_Adult,
+#         'Package_Child': Package_Child,
+#         'date': date,
+#         'total_price': total_price,
+#         'adult_count': adult_count,
+#         'child_count': child_count,
+#     }
+    
+#     ticket_pdf = TicketPDF(adult_count=adult_count, child_count=child_count)
+#     ticket_pdf.set_ticket_details(ticket_details)
+#     ticket_data = ticket_pdf.get_pdf_bytes()
+
+#     response = HttpResponse(ticket_data, content_type='application/pdf')
+#     response['Content-Disposition'] = f'attachment; ticket.pdf'
+
+#     return response

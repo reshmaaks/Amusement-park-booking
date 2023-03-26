@@ -1,8 +1,10 @@
+from os import path
 from unittest.util import _MAX_LENGTH
 from django.db import models
 from django.contrib.auth.models import User
 import datetime
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager ,PermissionsMixin
+from sklearn import model_selection
 
 class MyAccountManager(BaseUserManager):
     def create_user(self, username, email,phone, password=None):   
@@ -237,3 +239,55 @@ class Offer(models.Model):
 
     def __str__(self):
         return self.name        
+
+class BookingLimit(models.Model):
+
+    max_bookings = models.PositiveIntegerField(default=True)
+
+# from django.shortcuts import render,redirect
+# from django.contrib import admin
+
+# class Prediction(admin.ModelAdmin):
+#     def get_urls(self):
+#         urls = super().get_urls()
+#         custom_urls = [
+#             path('predict/', self.predict_view, name='predict'),
+#         ]
+#         return custom_urls + urls
+#     def predict_view(request):
+#             if request.method == 'POST':
+#                 # Get the form data
+#                 season = request.POST['season']
+#                 offers = request.POST['offers']
+                
+#                 # Convert the categorical variable to numerical variable
+#                 if season == 'Spring':
+#                     season_spring = 1
+#                     season_summer = 0
+#                     season_fall = 0
+#                     season_winter = 0
+#                 elif season == 'Summer':
+#                     season_spring = 0
+#                     season_summer = 1
+#                     season_fall = 0
+#                     season_winter = 0
+#                 elif season == 'Fall':
+#                     season_spring = 0
+#                     season_summer = 0
+#                     season_fall = 1
+#                     season_winter = 0
+#                 else:
+#                     season_spring = 0
+#                     season_summer = 0
+#                     season_fall = 0
+#                     season_winter = 1
+                
+#                 # Make a prediction using the trained model
+#                 prediction = round(model_selection.predict([[season_spring, season_summer, season_fall, season_winter, offers]])[0],)
+                
+#                 # Render the result template with the prediction
+#                 return render(request, 'result.html', {'season':season ,'offers':offers,'prediction': prediction})
+                
+#             else:
+#                 # Render the home template
+#                 return render(request, 'home.html')

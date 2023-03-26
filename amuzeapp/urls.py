@@ -5,8 +5,21 @@ from django.conf import settings
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from django.urls import path
+# from prediction.views import home
+# from .admin import custom_admin_site
+
+from django.urls import path
+from . import views, admin
+from django.urls import path
+# from .views import download_ticket
+
+
 urlpatterns = [
+    # path('admin/', custom_admin_site.urls),
     path('',views.index,name='index'),
+    path('', views.home, name='home'),
+    path('result', views.result, name='result'),
     path('about/',views.about,name='about'),
     path('contact/',views.contact,name='contact'),
     path('services/',views.services,name='services'),
@@ -41,23 +54,9 @@ urlpatterns = [
     path('indexfood/', views.indexfood, name='indexfood'),
     path('booked_food/', views.booked_food, name='booked_food'),
     path('food_details/<int:booking_id>/', views.food_details, name='food_details'),
+    path('serve_food_option/', views.serve_food_option, name='serve_food_option'),
+    path('food_option_display/', views.food_option_display, name='food_option_display'),
+    # path('download-ticket/', download_ticket, name='download_ticket'),
 
-
-
-
-
-
-
-
-
-
-
- 
-    
-
-]    
-
-
-
-
+]
 

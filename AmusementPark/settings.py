@@ -34,6 +34,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     
     'jazzmin',
+    'django_extensions',
+    'django_admin_shell',
     'razorpay',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,6 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'amuzeapp',
+    
+
+    
     
 ]
 

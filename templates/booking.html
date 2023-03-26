@@ -228,7 +228,7 @@
 		<div class="col-md-8 offset-md-2 booking-form">
 			<h2>				Booking Form</h2>
 			<form   action="{% url 'booking' %}" method="POST" >
-         
+         {% include 'alert.html' %}
 				{% csrf_token %}
 				<div class="form-group">
 					<label for="date">Select Date:</label>
@@ -281,7 +281,7 @@
 					<div class="scroll-row">
 						{% for food in food_options %}
 						<div class="meal-selection">
-							<input type="checkbox" id="food_select_{{ food.id }}" name="food_select" value="{{ food.id }}">
+							<!-- <input type="checkbox" id="food_select_{{ food.id }}" name="food_select" value="{{ food.id }}"> -->
 							<label class="meal-name" for="food_select_{{ food.id }}">{{ food.name }}</label>
 						<div class="meal-container">
 							

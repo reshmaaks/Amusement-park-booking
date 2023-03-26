@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Ticket</title>
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: Arial, sans-serif;
+		}
+
+		.container {
+			width: 3510px;
+			height: 2947px;
+			background-image: url('ticket_background.jpg');
+			background-size: cover;
+			position: relative;
+		}
+
+		.header {
+			position: absolute;
+			top: 100px;
+			left: 50%;
+			transform: translateX(-50%);
+			text-align: center;
+			color: #fff;
+			font-size: 48px;
+			font-weight: bold;
+			text-shadow: 2px 2px #000;
+			text-transform: uppercase;
+			letter-spacing: 10px;
+		}
+
+		.details {
+			position: absolute;
+			top: 300px;
+			left: 50%;
+			transform: translateX(-50%);
+			color: #000;
+			font-size: 36px;
+			font-weight: bold;
+			text-align: center;
+			letter-spacing: 5px;
+		}
+
+		.qrcode {
+			position: absolute;
+			bottom: 100px;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 300px;
+			height: 300px;
+			background-color: #fff;
+			border-radius: 10px;
+			box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+			overflow: hidden;
+		}
+
+		.qrcode img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">Amusement Park Ticket</div>
+		<div class="details">
+			Package: Premium<br>
+			Date: 2023-03-28<br>
+			Time: 10:00 AM<br>
+			Adult Count: 2<br>
+			Child Count: 3<br>
+			Total Price: $125.00
+		</div>
+		<div class="qrcode">
+			<img src="qrcode.png">
+		</div>
+	</div>
+</body>
+</html>

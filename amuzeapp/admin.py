@@ -1,10 +1,24 @@
 import csv
+from os import path
 from django.contrib import admin
 from django.http import HttpResponse
+from sklearn import model_selection
 from.models import *
 from django.contrib.auth.models import Group
 # Register your models here.
+# from django.shortcuts import render,redirect
 
+# from django.contrib import admin
+# from django.urls import reverse
+# from django.utils.html import format_html
+# from .models import Prediction
+# from .models import  Offer
+
+# class PredictionAdmin(admin.ModelAdmin):
+#     pass
+
+# admin.site.register(Prediction, PredictionAdmin)
+# admin.site.register(Prediction)
 
 
 admin.site.unregister(Group)
@@ -14,6 +28,13 @@ admin.site.register(Childpackage)
 admin.site.register(Review)
 admin.site.register(Payments)
 admin.site.register(Placed_Booking)
+# admin.site.register(BookingLimit)
+@admin.register(BookingLimit)
+class BookingLimitModelAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+    list_display = ['id', 'max_bookings']
+    list_editable = ['max_bookings']
 
 @admin.register(foodCategory)
 class foodCategoryModelAdmin(admin.ModelAdmin):
@@ -133,3 +154,4 @@ class OfferAdmin(admin.ModelAdmin):
     list_display = ('name', 'discount_percentage','count_adult','count_child', 'active')
 
 admin.site.register(Offer, OfferAdmin)
+

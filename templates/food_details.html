@@ -1,33 +1,65 @@
 {% extends 'nav.html' %}
 
 {% block content %}
-    <h1>{{ booking.user }}'s Food Details</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Food Name</th>
-                <th>Count</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for food_option in food_options %}
-                <tr>
-                    <td>{{ food_option.food_option.name }}</td>
-                    <td>{{ food_option.count }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="2">No food options selected.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <br>
-    <td>
-        {% if booking.status == 'served' %}
-            served
-        {% else %}
-            <button>Serve</button>
-        {% endif %}
-    </td>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <h1> Food Details</h1>
+  
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">Food Item</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Status</th>
+
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for food_option in food_options %}
+                    <tr>
+                      <td>{{ food_option.food_option.name }}</td>
+                      <td>{{ food_option.count }}</td>
+                      <td>
+                        {% if food_option.served %}
+                            <button class="btn btn-success" disabled>Served</button>
+                        {% else %}
+                            <button class="btn btn-primary serve-btn" data-booking-food-option-id="{{ food_option.id }}">Serve</button>
+                        {% endif %}
+                    </td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="2">No food options selected.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            
+<script>
+    $(function() {
+        // Include the CSRF token in the AJAX request
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            }
+        });
+
+        $('.serve-btn').click(function() {
+            var booking_food_option_id = $(this).data('booking-food-option-id');
+            $.post('{% url "serve_food_option" %}', {'booking_food_option_id': booking_food_option_id})
+                .done(function() {
+                    // Update the button label and color
+                    $('.serve-btn[data-booking-food-option-id="' + booking_food_option_id + '"]')
+                        .removeClass('btn-primary')
+                        .addClass('btn-success')
+                        .prop('disabled', true)
+                        .text('Served');
+                })
+                .fail(function() {
+                    alert('Failed to update the booking food option.');
+                });
+        });
+    });
+</script>
+       
 {% endblock %}
