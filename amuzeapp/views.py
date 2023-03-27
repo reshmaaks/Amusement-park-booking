@@ -616,98 +616,127 @@ def food_option_display(request):
     else:
         return redirect('login')
 
-
-#prediction
-from django.shortcuts import render
-import pandas as pd
-import pickle
-from sklearn.linear_model import LinearRegression
+# from django.shortcuts import render
+# import pandas as pd
+# import pickle
+# from sklearn.linear_model import LinearRegression
 
 
-csv_path = r'C:\Users\lenovo\predictions\predict\amusement_park_data.csv'
-# Load the amusement park dataset
-df = pd.read_csv(csv_path)
+# csv_path = r'C:\Users\lenovo\predictions\predict\amusement_park_data.csv'
+# # Load the amusement park dataset
+# df = pd.read_csv(csv_path)
 
-# Convert categorical variables to numerical variables
-df = pd.get_dummies(df, columns=['Season'])
+# # Convert categorical variables to numerical variables
+# df = pd.get_dummies(df, columns=['Season'])
+# # Train a linear regression model on the dataset
+# X = df.drop('Num_Customers', axis=1)
+# y = df['Num_Customers']
+# model = LinearRegression()
+# model.fit(X, y)
 
-# Train a linear regression model on the dataset
-X = df.drop('Num_Customers', axis=1)
-y = df['Num_Customers']
-model = LinearRegression()
-model.fit(X, y)
-
-def home(request):
-    if request.method == 'POST':
-        # Get the form data
-        season = request.POST['season']
-        offers = request.POST['offers']
+# def home(request):
+#     if request.method == 'POST':
+#         # Get the form data
+#         season = request.POST['season']
+#         offers = request.POST['offers']
+#         print(1)
+#         # Convert the categorical variable to numerical variable
+#         if season == 'Spring':
+#             print(2)
+#             season_spring = 1
+#             season_summer = 0
+#             season_fall = 0
+#             season_winter = 0
+#         elif season == 'Summer':
+#             season_spring = 0
+#             season_summer = 1
+#             season_fall = 0
+#             season_winter = 0
+#         elif season == 'Fall':
+#             season_spring = 0
+#             season_summer = 0
+#             season_fall = 1
+#             season_winter = 0
+#         else:
+#             season_spring = 0
+#             season_summer = 0
+#             season_fall = 0
+#             season_winter = 1
         
-        # Convert the categorical variable to numerical variable
-        if season == 'Spring':
-            season_spring = 1
-            season_summer = 0
-            season_fall = 0
-            season_winter = 0
-        elif season == 'Summer':
-            season_spring = 0
-            season_summer = 1
-            season_fall = 0
-            season_winter = 0
-        elif season == 'Fall':
-            season_spring = 0
-            season_summer = 0
-            season_fall = 1
-            season_winter = 0
-        else:
-            season_spring = 0
-            season_summer = 0
-            season_fall = 0
-            season_winter = 1
+#         # Make a prediction using the trained model
+#         prediction = round(model.predict([[season_spring, season_summer, season_fall, season_winter, offers]])[0],)
         
-        # Make a prediction using the trained model
-        prediction = round(model.predict([[season_spring, season_summer, season_fall, season_winter, offers]])[0],)
+#         # Render the result template with the prediction
+#         return render(request, 'predictapp/templates/result.html', {'season':season ,'offers':offers,'prediction': prediction})
         
-        # Render the result template with the prediction
-        return render(request, 'result.html', {'season':season ,'offers':offers,'prediction': prediction})
-        
-    else:
-        # Render the home template
-        return render(request, 'home.html')
-def result(request,prediction):
-    return render(request, 'home.html', {'prediction': prediction})        
+#     else:
+#         # Render the home template
+#         return render(request, 'predictapp/templates/home.html')
+# def result(request,prediction):
+#     return render(request, 'predictapp/templates/result.html', {'prediction': prediction})
+
+
+
+   
+    
     
 
-# from django.http import HttpResponse
+# # from django.http import HttpResponse
+# # from django.template.loader import get_template
+# # from django.conf import settings
+# # from io import BytesIO
+# # from .utils import TicketPDF
+# # def download_ticket(request):
+# #     booking = Book.objects.first()  # Get the first booking instance
+# #     adult_count = booking.count_adult
+# #     child_count = booking.count_child
+# #     Package_Adult = booking.p1_id
+# #     Package_Child = booking.p2_id
+
+# #     # ticket_type = 'Adult' if booking.p1_id == 'A' else 'Child'
+# #     date = booking.date
+# #     total_price = booking.total_price
+
+# #     ticket_details = {
+# #         'Package_Adult': Package_Adult,
+# #         'Package_Child': Package_Child,
+# #         'date': date,
+# #         'total_price': total_price,
+# #         'adult_count': adult_count,
+# #         'child_count': child_count,
+# #     }
+    
+# #     ticket_pdf = TicketPDF(adult_count=adult_count, child_count=child_count)
+# #     ticket_pdf.set_ticket_details(ticket_details)
+# #     ticket_data = ticket_pdf.get_pdf_bytes()
+
+# #     response = HttpResponse(ticket_data, content_type='application/pdf')
+# #     response['Content-Disposition'] = f'attachment; ticket.pdf'
+
+# #     return response
+# import os
+# import sys
+
+# sys.path.append(os.path.abspath(r"c:\users\lenovo\amusementpark\env\lib\site-packages"))
+
 # from django.template.loader import get_template
-# from django.conf import settings
-# from io import BytesIO
-# from .utils import TicketPDF
-# def download_ticket(request):
-#     booking = Book.objects.first()  # Get the first booking instance
-#     adult_count = booking.count_adult
-#     child_count = booking.count_child
-#     Package_Adult = booking.p1_id
-#     Package_Child = booking.p2_id
+# from xhtml2pdf import pisa
 
-#     # ticket_type = 'Adult' if booking.p1_id == 'A' else 'Child'
-#     date = booking.date
-#     total_price = booking.total_price
 
-#     ticket_details = {
-#         'Package_Adult': Package_Adult,
-#         'Package_Child': Package_Child,
-#         'date': date,
-#         'total_price': total_price,
-#         'adult_count': adult_count,
-#         'child_count': child_count,
-#     }
-    
-#     ticket_pdf = TicketPDF(adult_count=adult_count, child_count=child_count)
-#     ticket_pdf.set_ticket_details(ticket_details)
-#     ticket_data = ticket_pdf.get_pdf_bytes()
-
-#     response = HttpResponse(ticket_data, content_type='application/pdf')
-#     response['Content-Disposition'] = f'attachment; ticket.pdf'
-
+# def pdf_report_create(request):
+#     # products = Product.objects.all()
+#     template_path = 'ticket.html'
+#     context = {}
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = 'filename="products_report.pdf"'
+#     template = get_template(template_path)
+#     html = template.render(context)
+#     pisa_status = pisa.CreatePDF(
+#        html, dest=response)
+#     if pisa_status.err:
+#        return HttpResponse('We had some errors <pre>' + html + '</pre>')
 #     return response
+
+
+# def ticket(request):
+#     return render(request,ticket.html)

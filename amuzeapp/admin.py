@@ -1,5 +1,7 @@
 import csv
 from os import path
+# from .views import home
+# admin.site.register.urls(home)
 from django.contrib import admin
 from django.http import HttpResponse
 from sklearn import model_selection
@@ -19,7 +21,7 @@ from django.contrib.auth.models import Group
 
 # admin.site.register(Prediction, PredictionAdmin)
 # admin.site.register(Prediction)
-
+# admin.site.register(/home)
 
 admin.site.unregister(Group)
 

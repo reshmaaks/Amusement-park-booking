@@ -94,3 +94,69 @@ from fpdf import FPDF
 #         self.set_font('Arial', '', 12)
 #         self.set_auto_page_break(False)
 #         return self.output(dest='S').encode('latin1')
+from fpdf import FPDF
+
+class MyPDF(FPDF):
+    
+    def __init__(self):
+        super().__init__()
+        self.title = 'PDF Title'
+        self.author = 'Your Name'
+    
+    def header(self):
+        # Logo
+        self.image('logo.png', 10, 10, 30)
+        
+        # Arial bold 15
+        self.set_font('Arial', 'B', 15)
+        
+        # Title
+        self.cell(80)
+        self.cell(30, 10, self.title, 1, 0, 'C')
+        self.ln(20)
+    
+    def footer(self):
+        # Position at 1.5 cm from bottom
+        self.set_y(-15)
+        
+        # Arial italic 8
+        self.set_font('Arial', 'I', 8)
+        
+        # Page number
+        self.cell(0, 10, 'Page ' + str(self.page_no()), 0, 0, 'C')
+    
+    def chapter_title(self, title):
+        # Arial 12
+        self.set_font('Arial', '', 12)
+        
+        # Background color
+        self.set_fill_color(200, 220, 255)
+        
+        # Title
+        self.cell(0, 6, title, 0, 1, 'L', 1)
+        
+        # Line break
+        self.ln(4)
+    
+    def chapter_body(self, name):
+        # Read text file
+        with open(name, 'rb') as fh:
+            txt = fh.read().decode('latin-1')
+        
+        # Times 12
+        self.set_font('Times', '', 12)
+        
+        # Output justified text
+        self.multi_cell(0, 5, txt)
+        
+        # Line break
+        self.ln()
+        
+        # Mention in italics
+        self.set_font('','I')
+        self.cell(0,5,'(end of excerpt)')
+    
+    def print_chapter(self, title, name):
+        self.add_page()
+        self.chapter_title(title)
+        self.chapter_body(name)

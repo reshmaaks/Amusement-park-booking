@@ -1,16 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Amusement Park Prediction Result</title>
-</head>
-<body>
-	<h1>Amusement Park Prediction Result</h1>
-	<p>The predicted number of customers visit in next {{season}} is: {{ prediction }}</p>
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
 	<title>Amusement Park Prediction</title>
 	<style>
 		body {
@@ -103,12 +93,10 @@
 <body>
 	<div class="container">
 		<h1>Amusement Park Prediction</h1><br>
-		<br>
+		
 		<form method="POST" action="{% url 'home' %}">
 			{% csrf_token %}
-			<div>
-
-			</div>
+			
 			{% if prediction %}
 			<hr>
 			<h2 style="color: rgb(64, 255, 6);">Prediction Result</h2>
