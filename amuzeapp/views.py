@@ -393,6 +393,7 @@ def booking(request):
         booking = Book.objects.create(user=user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child, total_price=total_price,season=season)
         # ordered_booking = Placed_Booking.objects.create(user=booking.user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child)
         # ordered_booking.save()
+        
         food_selected = False
         for food in Product.objects.all():
             print(1)
@@ -435,14 +436,16 @@ def checkout(request, booking_id):
                 if child_offer not in eligible_offers:
                     eligible_offers.append(child_offer)
                     applied_offers_count += 1
-
-    # Check if the discount has already been applied
     if 'discount_applied' not in request.session:
         for offer in eligible_offers:
             discount = (latest_booking.total_price * offer.discount_percentage) / 100
             latest_booking.total_price -= discount
         request.session['discount_applied'] = True
-
+        # print(offer.discount_percentage)
+    print(offer.discount_percentage)
+    pred=predict.objects.create(season=latest_booking.season,count_adult=latest_booking.count_adult,count_child=latest_booking.count_child,offers=offer.discount_percentage)
+    # pred=predict.objects.create(offers=offer.discount_percentage)
+    pred.save()    
     latest_booking.applied_offers = applied_offers_count
     latest_booking.total_price = int(latest_booking.total_price)
 
@@ -616,25 +619,27 @@ def food_option_display(request):
     else:
         return redirect('login')
 
-# from django.shortcuts import render
-# import pandas as pd
-# import pickle
-# from sklearn.linear_model import LinearRegression
+from django.shortcuts import render
+import pandas as pd
+import pickle
+from sklearn.linear_model import LinearRegression
 
 
-# csv_path = r'C:\Users\lenovo\predictions\predict\amusement_park_data.csv'
-# # Load the amusement park dataset
-# df = pd.read_csv(csv_path)
+# # csv_path = r'C:\Users\lenovo\predictions\predict\predict.csv'
+# # # Load the amusement park dataset
+# # df = pd.read_csv(csv_path)
 
-# # Convert categorical variables to numerical variables
-# df = pd.get_dummies(df, columns=['Season'])
-# # Train a linear regression model on the dataset
-# X = df.drop('Num_Customers', axis=1)
-# y = df['Num_Customers']
-# model = LinearRegression()
-# model.fit(X, y)
+# # # Convert categorical variables to numerical variables
+# # df = pd.get_dummies(df, columns=['Season'])
+
+# # X = df.drop('Num_Customers', axis=1)
+# # y = df['Num_Customers']
+# # model = LinearRegression()
+# # model.fit(X, y)
 
 # def home(request):
+#     model=pickle.load(open('predict.pkl','rb'))
+#     data=pd.read_csv('predict.csv')
 #     if request.method == 'POST':
 #         # Get the form data
 #         season = request.POST['season']
@@ -664,56 +669,106 @@ def food_option_display(request):
 #             season_winter = 1
         
 #         # Make a prediction using the trained model
-#         prediction = round(model.predict([[season_spring, season_summer, season_fall, season_winter, offers]])[0],)
+#         # prediction = round(model.predict([[season_spring, season_summer, season_fall, season_winter, offers]])[0],)
+#         prediction=model.predict(pd.DataFrame(columns=['season','offers'],data=[[season,offers]]))
         
 #         # Render the result template with the prediction
-#         return render(request, 'predictapp/templates/result.html', {'season':season ,'offers':offers,'prediction': prediction})
+#         return render(request, 'result.html', {'season':season ,'offers':offers,'prediction': prediction})
         
 #     else:
 #         # Render the home template
-#         return render(request, 'predictapp/templates/home.html')
+#         return render(request, 'home.html')
 # def result(request,prediction):
-#     return render(request, 'predictapp/templates/result.html', {'prediction': prediction})
+#     return render(request, 'result.html', {'prediction': prediction})
 
+import pickle
+from django.shortcuts import render
+from django.http import JsonResponse
 
+# define the path to the pickle file
+# PICKLE_FILE = '/content/drive/My Drive/Colab Notebooks/predict.pkl'
 
-   
+def home(request):
+    if request.method == 'POST':
+        # extract the input data from the request
+        season = request.POST.get('season')
+        offers = float(request.POST.get('offers'))
+        
+        # load the trained model from the pickle file
+        with open('predict.pkl', 'rb') as f:
+            model = pickle.load(f)
+        
+        # convert the season variable to one-hot encoded values
+        if season == 'Spring':
+            season_spring = 1
+            season_summer = 0
+            season_fall = 0
+            season_winter = 0
+        elif season == 'Summer':
+            season_spring = 0
+            season_summer = 1
+            season_fall = 0
+            season_winter = 0
+        elif season == 'Fall':
+            season_spring = 0
+            season_summer = 0
+            season_fall = 1
+            season_winter = 0
+        else:
+            season_spring = 0
+            season_summer = 0
+            season_fall = 0
+            season_winter = 1
+        
+        # make a prediction using the trained model
+        prediction = round(model.predict([[season_spring, season_summer, season_fall, season_winter, offers]])[0],)    
+        
+        # return the prediction as a JSON response
+        return render(request, 'home.html', {'prediction': prediction})
     
+    # if the request method is not POST, render the template with a form
+    return render(request, 'home.html')
+
+def result(request,prediction):
+    return render(request, 'result.html', {'prediction': prediction})
+
+
+
+
+
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.conf import settings
+from io import BytesIO
+from .utils import TicketPDF
+def download_ticket(request):
+    booking = Book.objects.first()  # Get the first booking instance
+    adult_count = booking.count_adult
+    child_count = booking.count_child
+    Package_Adult = booking.p1_id
+    Package_Child = booking.p2_id
+
+    # ticket_type = 'Adult' if booking.p1_id == 'A' else 'Child'
+    date = booking.date
+    total_price = booking.total_price
+
+    ticket_details = {
+        'Package_Adult': Package_Adult,
+        'Package_Child': Package_Child,
+        'date': date,
+        'total_price': total_price,
+        'adult_count': adult_count,
+        'child_count': child_count,
+    }
     
+    ticket_pdf = TicketPDF(adult_count=adult_count, child_count=child_count)
+    ticket_pdf.set_ticket_details(ticket_details)
+    ticket_data = ticket_pdf.get_pdf_bytes()
 
-# # from django.http import HttpResponse
-# # from django.template.loader import get_template
-# # from django.conf import settings
-# # from io import BytesIO
-# # from .utils import TicketPDF
-# # def download_ticket(request):
-# #     booking = Book.objects.first()  # Get the first booking instance
-# #     adult_count = booking.count_adult
-# #     child_count = booking.count_child
-# #     Package_Adult = booking.p1_id
-# #     Package_Child = booking.p2_id
+    response = HttpResponse(ticket_data, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; ticket.pdf'
 
-# #     # ticket_type = 'Adult' if booking.p1_id == 'A' else 'Child'
-# #     date = booking.date
-# #     total_price = booking.total_price
-
-# #     ticket_details = {
-# #         'Package_Adult': Package_Adult,
-# #         'Package_Child': Package_Child,
-# #         'date': date,
-# #         'total_price': total_price,
-# #         'adult_count': adult_count,
-# #         'child_count': child_count,
-# #     }
-    
-# #     ticket_pdf = TicketPDF(adult_count=adult_count, child_count=child_count)
-# #     ticket_pdf.set_ticket_details(ticket_details)
-# #     ticket_data = ticket_pdf.get_pdf_bytes()
-
-# #     response = HttpResponse(ticket_data, content_type='application/pdf')
-# #     response['Content-Disposition'] = f'attachment; ticket.pdf'
-
-# #     return response
+    return response
 # import os
 # import sys
 

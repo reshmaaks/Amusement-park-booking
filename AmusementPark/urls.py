@@ -29,7 +29,7 @@ urlpatterns = [
 
 
     path('', include('amuzeapp.urls')),
-    path('predictapp/', include('predictapp.urls')),
+    # path('predictapp/', include('predictapp.urls')),
 
 
 ]

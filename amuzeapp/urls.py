@@ -18,8 +18,8 @@ from django.urls import path
 urlpatterns = [
     # path('admin/', custom_admin_site.urls),
     path('',views.index,name='index'),
-    # path('home/', views.home, name='home'),
-    # path('predictapp/templates/result/', views.result, name='result'),
+    path('home/', views.home, name='home'),
+    path('result/', views.result, name='result'),
     path('about/',views.about,name='about'),
     path('contact/',views.contact,name='contact'),
     path('services/',views.services,name='services'),
@@ -56,7 +56,7 @@ urlpatterns = [
     path('food_details/<int:booking_id>/', views.food_details, name='food_details'),
     path('serve_food_option/', views.serve_food_option, name='serve_food_option'),
     path('food_option_display/', views.food_option_display, name='food_option_display'),
-    # path('pdf_report_create', views.pdf_report_create, name='pdf_report_create'),
+    path('download_ticket', views.download_ticket, name='download_ticket'),
     # path('ticket', views.ticket, name='ticket'),
 
 

@@ -63,15 +63,15 @@ class ProductModelAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-@admin.register(BookingFoodOption)
-class BookingFoodOptionModelAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request, obj=None):
-        return False
-    def has_change_permission(self, request, obj=None):
-        return False
-    def has_delete_permission(self, request, obj=None):
-        return False
-# admin.site.register(BookingFoodOption)
+# @admin.register(BookingFoodOption)
+# class BookingFoodOptionModelAdmin(admin.ModelAdmin):
+#     def has_add_permission(self, request, obj=None):
+#         return False
+#     def has_change_permission(self, request, obj=None):
+#         return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
+admin.site.register(BookingFoodOption)
 
 
 @admin.register(Category)
@@ -95,6 +95,27 @@ class itemModelAdmin(admin.ModelAdmin):
     #     return False
     # def has_delete_permission(self, request, obj=None):
     #     return False
+def export_reg(modeladmin, request, queryset):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="predict.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['season','count_adult','count_child','offers'])
+    registration = queryset.values_list('season','count_adult','count_child','offers')
+    for i in registration:
+        writer.writerow(i)
+    return response
+
+export_reg.short_description = 'Export to csv'
+
+class predictAdmin(admin.ModelAdmin):
+    list_display = ['season','count_adult','count_child','offers']
+    actions = [export_reg]
+    def has_add_permission(self, request, obj=None):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+admin.site.register(predict,predictAdmin)
+
 
 
 def export_reg(modeladmin, request, queryset):

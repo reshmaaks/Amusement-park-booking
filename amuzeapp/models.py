@@ -146,6 +146,9 @@ class Adultpackage(models.Model):
     available=models.BooleanField(default=True)
     created=models.DateTimeField(auto_now_add=True)
     updated=models.DateTimeField(auto_now=True)
+    cost=models.BigIntegerField(default=0,null=True)
+
+
     def __str__(self):
         return str(self.name)
 
@@ -216,7 +219,7 @@ class Book(models.Model):
     count_child=models.BigIntegerField(default=1,null=True)
     total_price=models.BigIntegerField(default=0)
     food = models.BooleanField(default=False,null=True)
-    applied_offers = models.IntegerField(default=0,null= True)
+    applied_offers = models.IntegerField(default=0,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return str(self.user) 
@@ -229,7 +232,14 @@ class BookingFoodOption(models.Model):
     def __str__(self):
         return f"{self.count} x {self.food_option.name} ({self.booking.user.username})"
 
-
+class predict(models.Model):
+    season = models.CharField(max_length=20)
+    count_adult=models.BigIntegerField(default=1)
+    count_child=models.BigIntegerField(default=1)
+    offers = models.IntegerField(default=0,null= True)
+    def __str__(self):
+        return self.season 
+    
 class Offer(models.Model):
     name = models.CharField(max_length=255)
     discount_percentage = models.IntegerField()
@@ -243,51 +253,3 @@ class Offer(models.Model):
 class BookingLimit(models.Model):
 
     max_bookings = models.PositiveIntegerField(default=True)
-
-# from django.shortcuts import render,redirect
-# from django.contrib import admin
-
-# class Prediction(admin.ModelAdmin):
-#     def get_urls(self):
-#         urls = super().get_urls()
-#         custom_urls = [
-#             path('predict/', self.predict_view, name='predict'),
-#         ]
-#         return custom_urls + urls
-#     def predict_view(request):
-#             if request.method == 'POST':
-#                 # Get the form data
-#                 season = request.POST['season']
-#                 offers = request.POST['offers']
-                
-#                 # Convert the categorical variable to numerical variable
-#                 if season == 'Spring':
-#                     season_spring = 1
-#                     season_summer = 0
-#                     season_fall = 0
-#                     season_winter = 0
-#                 elif season == 'Summer':
-#                     season_spring = 0
-#                     season_summer = 1
-#                     season_fall = 0
-#                     season_winter = 0
-#                 elif season == 'Fall':
-#                     season_spring = 0
-#                     season_summer = 0
-#                     season_fall = 1
-#                     season_winter = 0
-#                 else:
-#                     season_spring = 0
-#                     season_summer = 0
-#                     season_fall = 0
-#                     season_winter = 1
-                
-#                 # Make a prediction using the trained model
-#                 prediction = round(model_selection.predict([[season_spring, season_summer, season_fall, season_winter, offers]])[0],)
-                
-#                 # Render the result template with the prediction
-#                 return render(request, 'result.html', {'season':season ,'offers':offers,'prediction': prediction})
-                
-#             else:
-#                 # Render the home template
-#                 return render(request, 'home.html')
