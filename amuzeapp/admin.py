@@ -27,7 +27,7 @@ admin.site.unregister(Group)
 
 admin.site.register(Adultpackage)
 admin.site.register(Childpackage)
-admin.site.register(Review)
+# admin.site.register(Review)
 admin.site.register(Payments)
 admin.site.register(Placed_Booking)
 # admin.site.register(BookingLimit)
@@ -128,6 +128,7 @@ def export_reg(modeladmin, request, queryset):
         writer.writerow(i)
     return response
 
+admin.site.register(Book)
 
 export_reg.short_description = 'Export to csv'
 

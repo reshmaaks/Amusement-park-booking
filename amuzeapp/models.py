@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 import datetime
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager ,PermissionsMixin
 from sklearn import model_selection
-
 class MyAccountManager(BaseUserManager):
     def create_user(self, username, email,phone, password=None):   
         
@@ -38,10 +37,7 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
     
-
 class Account(AbstractBaseUser,PermissionsMixin):
-    
-   
     # role_choices    =(('is_admin','is_admin'),('is_superadmin','is_superadmin'),('None','None'))
     id              = models.AutoField(primary_key=True)
     username        = models.CharField(max_length=100, unique=True)
@@ -53,13 +49,9 @@ class Account(AbstractBaseUser,PermissionsMixin):
     is_admin        =models.BooleanField(default=False)
     is_active        =models.BooleanField(default=False)
     # is_superuser   = models.BooleanField(default=False)
-
     objects = MyAccountManager()
-
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username','phone']
-   
 
     class Meta:
         db_table="home_account"
@@ -73,9 +65,6 @@ class Account(AbstractBaseUser,PermissionsMixin):
     def has_module_perms(self, app_label):
         return self.is_admin
 
-
-
-
 #foodcourt
 class food_login(models.Model):
     user = models.EmailField(max_length=200, unique=True, primary_key=True,default=1)
@@ -88,13 +77,10 @@ class food_registration(models.Model):
     username = models.CharField(max_length=200)
     phone = models.CharField(max_length=200)
     license=models.CharField(max_length=200,unique=True,null=True)
-
     user = models.ForeignKey(food_login, on_delete=models.SET_NULL, blank=True, null=True)
     password = models.CharField(max_length=100)
     def __str__(self):
         return str(self.username) 
-
-
 
 class item(models.Model):
     item = models.CharField(max_length=200, unique=True)
@@ -141,17 +127,12 @@ class Product(models.Model):
 class Adultpackage(models.Model):
     p1_id=models.AutoField(primary_key=True)
     name=models.CharField(max_length=250,unique=True)
-    description=models.TextField(blank=True)
     price=models.BigIntegerField(default=0)
     available=models.BooleanField(default=True)
     created=models.DateTimeField(auto_now_add=True)
     updated=models.DateTimeField(auto_now=True)
-    cost=models.BigIntegerField(default=0,null=True)
-
-
     def __str__(self):
-        return str(self.name)
-
+        return str(self.name)  
 
 class Childpackage(models.Model):
     p2_id=models.AutoField(primary_key=True)
@@ -164,18 +145,14 @@ class Childpackage(models.Model):
     def __str__(self):
         return str(self.name)        
         
-class Review(models.Model):
+
+class review(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100, blank=True)
-    review = models.CharField(max_length=500, blank=True)
-    # image= models.ImageField(upload_to='reviews/',blank=True,default=True)
-    star =models.IntegerField(default=False)
-
-
+    review_text = models.TextField()
+    rating = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
     def _str_(self):
         return str(self.user)
-
-
 
 class Payments(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE,null=True)
@@ -199,7 +176,6 @@ class Placed_Booking(models.Model):
     paid = models.BooleanField(default=False, null=True)
     def __str__(self):
         return self.user
-
 
 
 class Book(models.Model):
@@ -246,10 +222,8 @@ class Offer(models.Model):
     active = models.BooleanField(default=True)
     count_adult = models.PositiveIntegerField(null=True)
     count_child = models.PositiveIntegerField(null=True)
-
     def __str__(self):
         return self.name        
 
 class BookingLimit(models.Model):
-
     max_bookings = models.PositiveIntegerField(default=True)

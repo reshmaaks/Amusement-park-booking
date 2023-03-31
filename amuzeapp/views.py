@@ -1,5 +1,7 @@
 # import json
 # from django.http import JsonResponse
+import base64
+import os
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from hashlib import sha256
@@ -595,8 +597,8 @@ def food_details(request, booking_id):
         return render(request, 'food_details.html', {'food_options': food_options})
     else:
         return JsonResponse({'success': False})
-from django.views.decorators.csrf import csrf_exempt
 
+from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def serve_food_option(request):
     if 'email' in request.session:
@@ -610,7 +612,7 @@ def serve_food_option(request):
             return JsonResponse({'success': False, 'message': 'Invalid booking food option ID.'})
     else:
         return JsonResponse({'success': False, 'message': 'User is not authenticated.'})
-@login_required
+
 
 def food_option_display(request):
     if 'email' in request.session:
@@ -619,86 +621,58 @@ def food_option_display(request):
     else:
         return redirect('login')
 
+#filtering
 from django.shortcuts import render
-import pandas as pd
-import pickle
-from sklearn.linear_model import LinearRegression
+from .models import BookingFoodOption
+
+def booking_food_options(request):
+    served = request.GET.get('served', '')
+    if served:
+        booking_food_options = BookingFoodOption.objects.filter(served=(served == 'yes'))
+    else:
+        booking_food_options = BookingFoodOption.objects.all()
+
+    context = {
+        'booking_food_options': booking_food_options,
+    }
+    return render(request, 'food_option_display.html', context)
+
+def search_booking_food_options(request):
+    search_value = request.GET.get('search_value', '')
+    results = BookingFoodOption.objects.filter(Q(booking__user__email__icontains=search_value) | Q(booking__booking_date__icontains=search_value) | Q(food_option__name__icontains=search_value))
+    search_results = []
+    for result in results:
+        search_results.append({
+            'booking': result.booking.user,
+            'booking_date': result.booking.date,
+            'food_option': result.food_option,
+            'count': result.count,
+            'served': result.served
+        })
+    return JsonResponse({'results': search_results})
 
 
-# # csv_path = r'C:\Users\lenovo\predictions\predict\predict.csv'
-# # # Load the amusement park dataset
-# # df = pd.read_csv(csv_path)
+def create_review(request):
+    if request.method == 'POST':
+        review_text = request.POST['review_text']
+        rating = request.POST['rating']
+        user = request.user
+        reviews = review(user=user, review_text=review_text, rating=rating)
+        reviews.save()
+        messages.success(request,"Successfully Added")
+        return redirect('create_review')
+    return render(request, 'review.html')
 
-# # # Convert categorical variables to numerical variables
-# # df = pd.get_dummies(df, columns=['Season'])
-
-# # X = df.drop('Num_Customers', axis=1)
-# # y = df['Num_Customers']
-# # model = LinearRegression()
-# # model.fit(X, y)
-
-# def home(request):
-#     model=pickle.load(open('predict.pkl','rb'))
-#     data=pd.read_csv('predict.csv')
-#     if request.method == 'POST':
-#         # Get the form data
-#         season = request.POST['season']
-#         offers = request.POST['offers']
-#         print(1)
-#         # Convert the categorical variable to numerical variable
-#         if season == 'Spring':
-#             print(2)
-#             season_spring = 1
-#             season_summer = 0
-#             season_fall = 0
-#             season_winter = 0
-#         elif season == 'Summer':
-#             season_spring = 0
-#             season_summer = 1
-#             season_fall = 0
-#             season_winter = 0
-#         elif season == 'Fall':
-#             season_spring = 0
-#             season_summer = 0
-#             season_fall = 1
-#             season_winter = 0
-#         else:
-#             season_spring = 0
-#             season_summer = 0
-#             season_fall = 0
-#             season_winter = 1
-        
-#         # Make a prediction using the trained model
-#         # prediction = round(model.predict([[season_spring, season_summer, season_fall, season_winter, offers]])[0],)
-#         prediction=model.predict(pd.DataFrame(columns=['season','offers'],data=[[season,offers]]))
-        
-#         # Render the result template with the prediction
-#         return render(request, 'result.html', {'season':season ,'offers':offers,'prediction': prediction})
-        
-#     else:
-#         # Render the home template
-#         return render(request, 'home.html')
-# def result(request,prediction):
-#     return render(request, 'result.html', {'prediction': prediction})
 
 import pickle
 from django.shortcuts import render
 from django.http import JsonResponse
-
-# define the path to the pickle file
-# PICKLE_FILE = '/content/drive/My Drive/Colab Notebooks/predict.pkl'
-
 def home(request):
     if request.method == 'POST':
-        # extract the input data from the request
         season = request.POST.get('season')
         offers = float(request.POST.get('offers'))
-        
-        # load the trained model from the pickle file
         with open('predict.pkl', 'rb') as f:
             model = pickle.load(f)
-        
-        # convert the season variable to one-hot encoded values
         if season == 'Spring':
             season_spring = 1
             season_summer = 0
@@ -708,7 +682,7 @@ def home(request):
             season_spring = 0
             season_summer = 1
             season_fall = 0
-            season_winter = 0
+            season_winter = 0   
         elif season == 'Fall':
             season_spring = 0
             season_summer = 0
@@ -719,18 +693,30 @@ def home(request):
             season_summer = 0
             season_fall = 0
             season_winter = 1
-        
-        # make a prediction using the trained model
+        print(season)
         prediction = round(model.predict([[season_spring, season_summer, season_fall, season_winter, offers]])[0],)    
-        
-        # return the prediction as a JSON response
-        return render(request, 'home.html', {'prediction': prediction})
-    
-    # if the request method is not POST, render the template with a form
+        return render(request, 'home.html', {'season':season ,'prediction': prediction})
     return render(request, 'home.html')
 
-def result(request,prediction):
-    return render(request, 'result.html', {'prediction': prediction})
+    
+from django.shortcuts import render
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def offers_by_season(request):
+    df = pd.read_csv('predict.csv')
+    df['visitors'] = df['count_adult'] + df['count_child']
+    offers_df = df[['season', 'visitors', 'offers']]
+    offers_sum_df = offers_df.groupby('season')['offers'].sum()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.pie(offers_sum_df.values, labels=offers_sum_df.index, autopct='%1.1f%%', startangle=90)
+    ax.set_title('Offers by Season', fontsize=18)
+    image_path = os.path.join('static', 'pie_chart.png')
+    fig.savefig(image_path)
+    plt.close(fig)
+    return render(request, 'chart.html', {'chart': chart})
+def chart(request):
+    return  render(request, 'chart.html')
 
 
 
@@ -769,6 +755,8 @@ def download_ticket(request):
     response['Content-Disposition'] = f'attachment; ticket.pdf'
 
     return response
+
+
 # import os
 # import sys
 

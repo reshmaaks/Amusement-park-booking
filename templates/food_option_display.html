@@ -1,14 +1,105 @@
 {% extends 'nav.html' %}
 
 {% block content %}
+
+<head>
+    <style>
+        /* Style the filter form */
+.filter-form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+/* Style the form group */
+.form-group {
+  margin-right: 1rem;
+}
+
+/* Style the select element */
+.form-control {
+  padding: 0.5rem 5rem;
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+}
+
+/* Style the filter button */
+.btn {
+  margin-left: -1800%;  
+  margin-bottom: -55%;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+}
+
+.btn:hover {
+  background-color: #0069d9;
+}
+
+    </style>
+</head>
+
+
     <h1>Booking Food Options</h1>
+     
+    <input type="text" id="search-input" placeholder="Search...">
+<script>
+    $(document).ready(function() {
+  $('#search-input').on('input', function() {
+    var searchValue = $(this).val();
+    $.ajax({
+      url: '/search/',
+      data: {
+        'search_value': searchValue
+      },
+      dataType: 'json',
+      success: function(data) {
+        // Clear the table
+        $('#booking-table tbody').empty();
+        // Iterate through the search results and append them to the table
+        $.each(data.results, function(index, result) {
+          var row = $('<tr>');
+          row.append($('<td>').text(result.booking));
+          row.append($('<td>').text(result.booking_date));
+          row.append($('<td>').text(result.food_option));
+          row.append($('<td>').text(result.count));
+          row.append($('<td>').text(result.served ? 'Yes' : 'No'));
+          $('#booking-table tbody').append(row);
+        });
+      }
+    });
+  });
+});
+
+</script>
+
+    <form method="GET" action="{% url 'booking_food_options' %}" class="filter-form">
+        <div class="form-group">
+            <label for="served">Served:</label>
+            <select id="served" name="served" class="form-control">
+                <option value="" selected disabled>Select</option>
+                <option value="">All</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+    
+
 
     <table class="table">
         <thead>
             <tr>
                 <th scope="col">Booking</th>
                 <th scope="col">Booked date</th>
-
                 <th scope="col">Food Option</th>
                 <th scope="col">Count</th>
                 <th scope="col">Served</th>
@@ -19,7 +110,6 @@
                 <tr>
                     <td>{{ booking_food_option.booking }}</td>
                     <td>{{ booking_food_option.booking.date }}</td>
-
                     <td>{{ booking_food_option.food_option }}</td>
                     <td>{{ booking_food_option.count }}</td>
                     <td>{% if booking_food_option.served %}Yes{% else %}No{% endif %}</td>

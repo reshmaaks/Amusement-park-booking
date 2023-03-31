@@ -27,7 +27,7 @@
 		}
 		
 		form {
-			width: 50% ;
+			width: 40% ;
 
 			display: flex;
 			flex-direction: column;
@@ -417,137 +417,80 @@
 								{% endfor %}
 							{% endblock messages %}
 							<div class="row">
-								{% block content %}
-								 <div class="container">
-									<h1>Amusement Park Prediction</h1>
-									<form method="POST" action="{% url 'home' %}">
-										{% csrf_token %}
-										<label for="season">Season:</label>
-										<select name="season" required>
-											<option value="">Choose a season</option>
-											<option value="Spring">Spring</option>
-											<option value="Summer">Summer</option>
-											<option value="Fall">Fall</option>
-											<option value="Winter">Winter</option>
-										</select>
-										
-										<label for="offers">Discount (%):</label>
-										<select name="offers" required>
-										<option value="">Discount</option>
-											<option value="10">10% off</option>
-											<option value="20">20% off</option>
-											<option value="30">30% off</option>
-											<option value="40">40% off</option>
-											<option value="50">50% off</option>
+								
 
-										</select>
-
-										<button type="submit">Predict</button>
-										{% if prediction %}
-										<hr>
-										<h2 style="color: rgb(64, 255, 6);">Prediction Result</h2>
-										<p style="color: rgb(64, 255, 6);">The predicted number of customers visiting in next {{ season }} is: {{ prediction }}</p>
-										{% else %}
-										<p style="color: rgb(64, 255, 6);"></p>
-							
-										{% endif %}
-									</form>
-									
-							
-								</div>{% endblock %}
-							</div>
-						</section>
-					</div>
-				</div>
-	
-	
-			{% endblock %}
-		</div>
-	
-	{% block footer %}
-		{% if not is_popup %}
-			<footer class="main-footer {{ jazzmin_ui.footer_classes }}">
-				<div class="float-right d-none d-sm-inline">
-					<b>{% trans 'Jazzmin version' %}</b> {% get_jazzmin_version %}
-				</div>
-				{% autoescape off %}
-					<strong>{% trans 'Copyright' %} &copy; {% now 'Y' %} {{ jazzmin_settings.copyright }}.</strong> {% trans 'All rights reserved.' %}
-				{% endautoescape %}
-			</footer>
-			{% if jazzmin_settings.show_ui_builder %}
-				{% include 'jazzmin/includes/ui_builder_panel.html' %}
-			{% endif %}
-		{% endif %}
-	{% endblock %}
-	
-	</div>
-	
-	{% if jazzmin_settings.show_ui_builder %}
-	<div id="codeBox" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h4 class="modal-title">{% trans 'UI Configuration' %}</h4>
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-				</div>
-				<div class="modal-body">
-					<p>{% trans 'Copy this info your settings file to persist these UI changes' %}</p>
-					<pre><code></code></pre>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn {{ jazzmin_ui.button_classes.danger }}" data-dismiss="modal">{% trans 'Close' %}</button>
-				</div>
-			</div>
-	
-		</div>
-	</div>
-	{% endif %}
-	
-	<!-- jQuery -->
-	<script src="{% static "admin/js/vendor/jquery/jquery.js" %}"></script>
-	<!-- Bootstrap 4 -->
-	<script src="{% static "vendor/bootstrap/js/bootstrap.min.js" %}"></script>
-	<!-- AdminLTE App -->
-	<script src="{% static "vendor/adminlte/js/adminlte.min.js" %}"></script>
-	<!-- Django customisations -->
-	<script src="{% static "jazzmin/js/main.js" %}"></script>
-	
-	{% if jazzmin_settings.custom_js %}
-	<script src="{% static jazzmin_settings.custom_js %}"></script>
-	{% endif %}
-	
-	{% if jazzmin_settings.show_ui_builder %}
-	<script>
-		window.ui_changes = { jazzmin_ui,raw,as_json,safe };
-	</script>
-	<script src="{% static "jazzmin/js/ui-builder.js" %}"></script>
-	{% endif %}
-	
-	{% block extrajs %}{% endblock %}
-
-	
+{% block content %}
+  <img src="data:image/png;base64,{{ chart }}" alt="Pie Chart" />
+  {% endblock %}
+</div>
+</section>
+</div>
+</div>
 
 
+{% endblock %}
+</div>
 
+{% block footer %}
+{% if not is_popup %}
+<footer class="main-footer {{ jazzmin_ui.footer_classes }}">
+<div class="float-right d-none d-sm-inline">
+<b>{% trans 'Jazzmin version' %}</b> {% get_jazzmin_version %}
+</div>
+{% autoescape off %}
+<strong>{% trans 'Copyright' %} &copy; {% now 'Y' %} {{ jazzmin_settings.copyright }}.</strong> {% trans 'All rights reserved.' %}
+{% endautoescape %}
+</footer>
+{% if jazzmin_settings.show_ui_builder %}
+{% include 'jazzmin/includes/ui_builder_panel.html' %}
+{% endif %}
+{% endif %}
+{% endblock %}
 
+</div>
 
+{% if jazzmin_settings.show_ui_builder %}
+<div id="codeBox" class="modal fade" role="dialog">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">{% trans 'UI Configuration' %}</h4>
+<button type="button" class="close" data-dismiss="modal">&times;</button>
+</div>
+<div class="modal-body">
+<p>{% trans 'Copy this info your settings file to persist these UI changes' %}</p>
+<pre><code></code></pre>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn {{ jazzmin_ui.button_classes.danger }}" data-dismiss="modal">{% trans 'Close' %}</button>
+</div>
+</div>
 
+</div>
+</div>
+{% endif %}
 
+<!-- jQuery -->
+<script src="{% static "admin/js/vendor/jquery/jquery.js" %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static "vendor/bootstrap/js/bootstrap.min.js" %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static "vendor/adminlte/js/adminlte.min.js" %}"></script>
+<!-- Django customisations -->
+<script src="{% static "jazzmin/js/main.js" %}"></script>
 
+{% if jazzmin_settings.custom_js %}
+<script src="{% static jazzmin_settings.custom_js %}"></script>
+{% endif %}
 
+{% if jazzmin_settings.show_ui_builder %}
+<script>
+window.ui_changes = { jazzmin_ui,raw,as_json,safe };
+</script>
+<script src="{% static "jazzmin/js/ui-builder.js" %}"></script>
+{% endif %}
 
-
-
-
-
-
-
-
-
-
-
-
-
+{% block extrajs %}{% endblock %}
 
 </body>
 </html>
