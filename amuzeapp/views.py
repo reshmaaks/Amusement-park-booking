@@ -395,7 +395,6 @@ def booking(request):
         booking = Book.objects.create(user=user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child, total_price=total_price,season=season)
         # ordered_booking = Placed_Booking.objects.create(user=booking.user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child)
         # ordered_booking.save()
-        
         food_selected = False
         for food in Product.objects.all():
             print(1)
@@ -420,98 +419,100 @@ from django.db.models import Q
 
 @login_required(login_url='viewlogin') 
 def checkout(request, booking_id):
-    latest_booking = Book.objects.get(id=booking_id)
-    active_offers = Offer.objects.filter(active=True)
-    booking_food_options = latest_booking.bookingfoodoption_set.all()
-    applied_offers_count = 0
-    eligible_offers = []
-    for offer in active_offers:
-        if offer.count_adult is not None and latest_booking.count_adult >= offer.count_adult:
-            adult_offers = active_offers.filter(count_adult__lte=latest_booking.count_adult)
-            for adult_offer in adult_offers:
-                if adult_offer not in eligible_offers:
-                    eligible_offers.append(adult_offer)
-                    applied_offers_count += 1
-        if offer.count_child is not None and latest_booking.count_child >= offer.count_child:
-            child_offers = active_offers.filter(count_child__lte=latest_booking.count_child)
-            for child_offer in child_offers:
-                if child_offer not in eligible_offers:
-                    eligible_offers.append(child_offer)
-                    applied_offers_count += 1
-    if 'discount_applied' not in request.session:
-        for offer in eligible_offers:
-            discount = (latest_booking.total_price * offer.discount_percentage) / 100
-            latest_booking.total_price -= discount
-        request.session['discount_applied'] = True
-        # print(offer.discount_percentage)
-    print(offer.discount_percentage)
-    pred=predict.objects.create(season=latest_booking.season,count_adult=latest_booking.count_adult,count_child=latest_booking.count_child,offers=offer.discount_percentage)
-    # pred=predict.objects.create(offers=offer.discount_percentage)
-    pred.save()    
-    latest_booking.applied_offers = applied_offers_count
-    latest_booking.total_price = int(latest_booking.total_price)
+    # if request.method == 'POST':
+        latest_booking = Book.objects.get(id=booking_id)
+        active_offers = Offer.objects.filter(active=True)
+        booking_food_options = latest_booking.bookingfoodoption_set.all()
+        applied_offers_count = 0
+        eligible_offers = []
+        for offer in active_offers:
+            if offer.count_adult is not None and latest_booking.count_adult >= offer.count_adult:
+                adult_offers = active_offers.filter(count_adult__lte=latest_booking.count_adult)
+                for adult_offer in adult_offers:
+                    if adult_offer not in eligible_offers:
+                        eligible_offers.append(adult_offer)
+                        applied_offers_count += 1
+            if offer.count_child is not None and latest_booking.count_child >= offer.count_child:
+                child_offers = active_offers.filter(count_child__lte=latest_booking.count_child)
+                for child_offer in child_offers:
+                    if child_offer not in eligible_offers:
+                        eligible_offers.append(child_offer)
+                        applied_offers_count += 1
+        if 'discount_applied' not in request.session:
+            for offer in eligible_offers:
+                discount = (latest_booking.total_price * offer.discount_percentage) / 100
+                latest_booking.total_price -= discount
+            request.session['discount_applied'] = True
+            # print(offer.discount_percentage)
+        print(offer.discount_percentage)
+        pred=predict.objects.create(season=latest_booking.season,count_adult=latest_booking.count_adult,count_child=latest_booking.count_child,offers=offer.discount_percentage)
+        # pred=predict.objects.create(offers=offer.discount_percentage)
+        pred.save()    
+        latest_booking.applied_offers = applied_offers_count
+        latest_booking.total_price = int(latest_booking.total_price)
 
-    client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET_KEY))
-    data = {
-        'amount': latest_booking.total_price * 100,  # Convert to paise
-        'currency': 'INR',
-        'receipt': str(latest_booking.id),
-        'payment_capture': 1,
-    }
-    order = client.order.create(data=data)
-    order_id = order['id']
-    print(order_id)
-    request.session['order_id'] = order_id
-    request.session['booking_id'] = booking_id
-    order_status = order['status']
-    if order_status == 'created':
-        payment = Payments.objects.create(
-            user=latest_booking.user,
-            amount=latest_booking.total_price,
-            razorpay_order_id=order_id,
-            razorpay_payment_status=order_status,
-        )
-        latest_booking.payment = payment
-        latest_booking.save()
-        # return render(request,'success.html')
+        client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET_KEY))
+        data = {
+            'amount': latest_booking.total_price * 100,  # Convert to paise
+            'currency': 'INR',
+            'receipt': str(latest_booking.id),
+            'payment_capture': 1,
+        }
+        order = client.order.create(data=data)
+        order_id = order['id']
+        print(order_id)
+        request.session['order_id'] = order_id
+        request.session['booking_id'] = booking_id
+        order_status = order['status']
+        if order_status == 'created':
+            payment = Payments.objects.create(
+                user=latest_booking.user,
+                amount=latest_booking.total_price,
+                razorpay_order_id=order_id,
+                razorpay_payment_status=order_status,
+            )
+            latest_booking.payment = payment
+            latest_booking.save()
+            # return render(request,'success.html')
 
-    context = {
-        'booking_food_options': booking_food_options,
-        'latest_booking': latest_booking,
-        'eligible_offers': eligible_offers,
-        'order_id': order_id
-    }
+        context = {
+            'booking_food_options': booking_food_options,
+            'latest_booking': latest_booking,
+            'eligible_offers': eligible_offers,
+            'order_id': order_id
+        }
 
-    return render(request, 'checkout.html', context)
-
+        return render(request, 'checkout.html', context)
+    
 
 
 @login_required(login_url='login')
 def paymentdone(request):
-    urls=request.META.get('HTTP_REFERER')
-    payment=''
-    if request.GET.get('payment_id') :
-        payment_id = request.GET.get('payment_id', None)
-        print(payment_id)
-        payment=Payments.objects.get(razorpay_order_id=request.session['order_id'])
-        payment.razorpay_payment_id=payment_id
-        payment.paid=True
-        payment.save()
-        booking_id = request.session['booking_id']
-        booking = Book.objects.get(id=booking_id)
-        ordered_booking=Placed_Booking.objects.create(
-            user=booking.user,
-            p1_id=booking.p1_id,
-            p2_id=booking.p2_id,
-            date=booking.date,
-            count_adult=booking.count_adult,
-            count_child=booking.count_child,
-            total_price=booking.total_price,
-            paid=True
-        )
-        ordered_booking.save()
-        return render(request,'paymentdone.html')
-    return redirect(booking)
+    # if request.method == 'POST':
+        urls=request.META.get('HTTP_REFERER')
+        payment=''
+        if request.GET.get('payment_id') :
+            payment_id = request.GET.get('payment_id', None)
+            print(payment_id)
+            payment=Payments.objects.get(razorpay_order_id=request.session['order_id'])
+            payment.razorpay_payment_id=payment_id
+            payment.paid=True
+            payment.save()
+            booking_id = request.session['booking_id']
+            booking = Book.objects.get(id=booking_id)
+            ordered_booking=Placed_Booking.objects.create(
+                user=booking.user,
+                p1_id=booking.p1_id,
+                p2_id=booking.p2_id,
+                date=booking.date,
+                count_adult=booking.count_adult,
+                count_child=booking.count_child,
+                total_price=booking.total_price,
+                paid=True
+            )
+            ordered_booking.save()
+            return render(request,'paymentdone.html')
+        return redirect(booking)
 
 
 def item_add(request):
@@ -652,15 +653,28 @@ def search_booking_food_options(request):
     return JsonResponse({'results': search_results})
 
 
+# def lktj(request):
+#     if request.method == 'POST':
+#         user = request.user
+#         review_text = request.POST['review_text']
+#         rating = request.POST['rating']
+#         reviews = review(user=user, review_text=review_text, rating=rating)
+#         reviews.save()
+#         messages.success(request,"Successfully Added")
+#         return redirect('create_review')
+#     return render(request, 'review.html')
+
+
+
 def create_review(request):
     if request.method == 'POST':
+        user = request.user
         review_text = request.POST['review_text']
         rating = request.POST['rating']
-        user = request.user
-        reviews = review(user=user, review_text=review_text, rating=rating)
-        reviews.save()
-        messages.success(request,"Successfully Added")
-        return redirect('create_review')
+        review = review(user=user, review_text=review_text, rating=rating)
+        review.save()
+        messages.success(request,"Review successfully added")
+        return redirect('review')
     return render(request, 'review.html')
 
 

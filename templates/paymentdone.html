@@ -13,7 +13,7 @@
         </style>
         </head>
     <body>
-
+    <form method="POST">
         {% block content %}
         <center><img src="{% static 'images/check-circle.gif' %}">
         <h1>Payment Successful</h1>
@@ -21,6 +21,8 @@
             <br>
             <br>
             <h4>Download your tickets here!</h4><a href="{% url 'download_ticket' %}">Download Ticket</a>
+            
+        </form>
 
         </center> 
 

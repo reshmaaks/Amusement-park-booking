@@ -146,13 +146,7 @@ class Childpackage(models.Model):
         return str(self.name)        
         
 
-class review(models.Model):
-    user = models.ForeignKey(Account, on_delete=models.CASCADE)
-    review_text = models.TextField()
-    rating = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    def _str_(self):
-        return str(self.user)
+
 
 class Payments(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE,null=True)
@@ -227,3 +221,12 @@ class Offer(models.Model):
 
 class BookingLimit(models.Model):
     max_bookings = models.PositiveIntegerField(default=True)
+
+class review(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    booking = models.ForeignKey(Book, on_delete=models.CASCADE)
+    review_text = models.TextField()
+    rating = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return str(self.user)

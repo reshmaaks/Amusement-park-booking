@@ -59,7 +59,7 @@ urlpatterns = [
     path('download_ticket', views.download_ticket, name='download_ticket'),
     path('booking_food_options', views.booking_food_options, name='booking_food_options'),
     path('search/', search_booking_food_options, name='search_booking_food_options'),
-    path('create_review/', create_review, name='create_review'),
+    path('booking/<int:booking_id>/review/create/', views.create_review, name='create_review'),
 
 
 
