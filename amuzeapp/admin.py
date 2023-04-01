@@ -1,36 +1,20 @@
 import csv
 from os import path
-# from .views import home
-# admin.site.register.urls(home)
 from django.contrib import admin
 from django.http import HttpResponse
-from sklearn import model_selection
 from.models import *
 from django.contrib.auth.models import Group
-# Register your models here.
-# from django.shortcuts import render,redirect
-
-# from django.contrib import admin
-# from django.urls import reverse
-# from django.utils.html import format_html
-# from .models import Prediction
-# from .models import  Offer
-
-# class PredictionAdmin(admin.ModelAdmin):
-#     pass
-
-# admin.site.register(Prediction, PredictionAdmin)
-# admin.site.register(Prediction)
-# admin.site.register(/home)
+from django.core.exceptions import ValidationError
 
 admin.site.unregister(Group)
+class AdultpackageModelAdmin(admin.ModelAdmin):
+    list_display = ['p1_id', 'name', 'price', 'available']
+admin.site.register(Adultpackage, AdultpackageModelAdmin)
 
-admin.site.register(Adultpackage)
-admin.site.register(Childpackage)
-# admin.site.register(Review)
-admin.site.register(Payments)
-admin.site.register(Placed_Booking)
-# admin.site.register(BookingLimit)
+class ChildpackageModelAdmin(admin.ModelAdmin):
+    list_display = ['p2_id', 'name', 'price', 'available']
+admin.site.register(Childpackage,ChildpackageModelAdmin)
+
 @admin.register(BookingLimit)
 class BookingLimitModelAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
@@ -46,6 +30,7 @@ class foodCategoryModelAdmin(admin.ModelAdmin):
         return False
     def has_delete_permission(self, request, obj=None):
         return False
+
 @admin.register(fooditem)
 class fooditemModelAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
@@ -54,6 +39,7 @@ class fooditemModelAdmin(admin.ModelAdmin):
         return False
     def has_delete_permission(self, request, obj=None):
         return False
+
 @admin.register(Product)
 class ProductModelAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
@@ -63,15 +49,15 @@ class ProductModelAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-# @admin.register(BookingFoodOption)
-# class BookingFoodOptionModelAdmin(admin.ModelAdmin):
-#     def has_add_permission(self, request, obj=None):
-#         return False
-#     def has_change_permission(self, request, obj=None):
-#         return False
-#     def has_delete_permission(self, request, obj=None):
-#         return False
-admin.site.register(BookingFoodOption)
+@admin.register(BookingFoodOption)
+class BookingFoodOptionModelAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+# admin.site.register(BookingFoodOption)
 
 
 @admin.register(Category)
@@ -128,8 +114,16 @@ def export_reg(modeladmin, request, queryset):
         writer.writerow(i)
     return response
 
-admin.site.register(Book)
-
+class BookAdmin(admin.ModelAdmin):
+    list_display=['user','p1_id','p2_id','date','count_adult','count_child','total_price','food','paid']
+    def has_add_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+    verbose_name_plural = "Volunteers Details"
+admin.site.register(Placed_Booking,BookAdmin)
 export_reg.short_description = 'Export to csv'
 
 
@@ -145,7 +139,6 @@ class RegAdmin(admin.ModelAdmin):
 admin.site.register(Account,RegAdmin)
 
 
-
 class foodAdmin(admin.ModelAdmin):
     list_display=['username']
     exclude=('password',)
@@ -155,7 +148,6 @@ class foodAdmin(admin.ModelAdmin):
         return False
     def has_delete_permission(self, request, obj=None):
         return False
-    verbose_name_plural = "Volunteers Details"
 admin.site.register(food_registration,foodAdmin)
 
 class foodcourtLoginAdmin(admin.ModelAdmin):
@@ -176,6 +168,14 @@ from .models import Offer
 
 class OfferAdmin(admin.ModelAdmin):
     list_display = ('name', 'discount_percentage','count_adult','count_child', 'active')
-
 admin.site.register(Offer, OfferAdmin)
 
+class paymentAdmin(admin.ModelAdmin):
+    list_display=['user','amount','razorpay_order_id','razorpay_payment_status','razorpay_payment_id','paid']
+    def has_add_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+admin.site.register(Payments,paymentAdmin)

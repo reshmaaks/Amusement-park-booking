@@ -7,6 +7,7 @@ from django.utils import timezone
 from hashlib import sha256
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render,redirect,get_object_or_404
+import pandas as pd
 from .models import *
 from django.contrib import messages
 from django.contrib.auth import authenticate
@@ -28,7 +29,6 @@ import razorpay
 from django.conf import settings
 
 def index(request):
-
     product = Product.objects.all()
     categories = Category.objects.all()
     itms = item.objects.all()
@@ -60,18 +60,6 @@ def showitem(request, iid):
     }
     return render(request, 'index.html',data)
 
-# def showcategory(request, cid):
-#     categories = Category.objects.all()
-#     # obj = Deals.objects.all()
-#     cats = Category.objects.get(pk=cid)
-#     product = Product.objects.filter(cat=cats)
-#     data = {
-#         # 'categories':categories,
-#         # 'result': obj,
-#         'product': product
-#     }
-#     return render(request, 'index.html', data)
-    
 def about(request):
     return render(request,'about.html')
 
@@ -86,11 +74,17 @@ def contact(request):
 
 def services(request):
     return render(request,'services.html')
-def packages(request):
-    return render(request,'packages.html')
 
-# def login(request):
-#     return render(request,'login.html')
+def packages(request):
+    if 'email' in request.session:
+        obj=Adultpackage.objects.all()
+        obj2=Childpackage.objects.all()
+        context={
+            'obj':obj,
+            'obj2':obj2
+        }
+        return render(request,'packages.html',context)
+    return render(request,'index.html')
 
 def register(request):
     if request.method == 'POST':
@@ -180,7 +174,7 @@ def change_password(request):
             else:
                  messages.error(request, 'Password does not match!')
                  return redirect('change_password')
-    return render(request, 'change_password.html')     
+    return render(request, 'change.html')     
 
 def foodregistrations(request):
     if request.method == 'POST':
@@ -318,7 +312,7 @@ def edit_food_category(request, pk):
     return redirect('dashboard')
 
 
-
+@login_required
 def food_category_dis(request):
     if 'email' in request.session:
         data=foodCategory.objects.all()
@@ -335,7 +329,7 @@ def food_category_dis(request):
 #     return render(request, 'food_category_dis.html')    
 
 
- 
+@login_required
 def delete_food_category(request,id):
     if 'email' in request.session:
         category=foodCategory.objects.filter(id=id)
@@ -353,7 +347,7 @@ def delete_food_category(request,id):
 import razorpay
 from datetime import datetime
 
-@login_required(login_url='viewlogin')
+@login_required
 def booking(request):
     if request.method == 'POST':
         user = request.user
@@ -417,7 +411,7 @@ def booking(request):
 
 from django.db.models import Q
 
-@login_required(login_url='viewlogin') 
+@login_required 
 def checkout(request, booking_id):
     # if request.method == 'POST':
         latest_booking = Book.objects.get(id=booking_id)
@@ -462,6 +456,7 @@ def checkout(request, booking_id):
         order_id = order['id']
         print(order_id)
         request.session['order_id'] = order_id
+        print(order_id)
         request.session['booking_id'] = booking_id
         order_status = order['status']
         if order_status == 'created':
@@ -486,7 +481,7 @@ def checkout(request, booking_id):
     
 
 
-@login_required(login_url='login')
+@login_required
 def paymentdone(request):
     # if request.method == 'POST':
         urls=request.META.get('HTTP_REFERER')
@@ -494,7 +489,8 @@ def paymentdone(request):
         if request.GET.get('payment_id') :
             payment_id = request.GET.get('payment_id', None)
             print(payment_id)
-            payment=Payments.objects.get(razorpay_order_id=request.session['order_id'])
+            payment = Payments.objects.get(razorpay_order_id=request.session['order_id'])
+
             payment.razorpay_payment_id=payment_id
             payment.paid=True
             payment.save()
@@ -507,6 +503,7 @@ def paymentdone(request):
                 date=booking.date,
                 count_adult=booking.count_adult,
                 count_child=booking.count_child,
+                food=booking.food,
                 total_price=booking.total_price,
                 paid=True
             )
@@ -514,7 +511,7 @@ def paymentdone(request):
             return render(request,'paymentdone.html')
         return redirect(booking)
 
-
+@login_required
 def item_add(request):
     if 'email' in request.session:
         if request.method == 'POST':
@@ -540,7 +537,7 @@ def item_add(request):
             return render(request, 'item_add.html', {'obj':obj, 'items': categories})
     return redirect(dashboard)
 
-
+@login_required
 def item_view(request):
     if 'email' in request.session:
         data=Product.objects.all()
@@ -548,7 +545,7 @@ def item_view(request):
         return render(request,'item_view.html',context)
     return redirect(dashboard)
 
-
+@login_required
 def delete_item_view(request,id):
     if 'email' in request.session:
         category=Product.objects.filter(id=id)
@@ -557,7 +554,7 @@ def delete_item_view(request,id):
         return redirect(item_view)  
     # return redirect(dashboard)
     return HttpResponse("Please Login") 
-
+@login_required
 def edit_item(request, pk):
     product = get_object_or_404(Product, pk=pk)
     if request.method == 'POST':
@@ -581,7 +578,7 @@ def edit_item(request, pk):
         return render(request, 'edit_item.html', {'product': product, 'categories': categories})
 
 from django.utils import timezone
-
+@login_required
 def booked_food(request):
     today = timezone.now().date() # get today's date in timezone
     bookings_today = Book.objects.filter(date__exact=today, food=True) # filter only food bookings
@@ -590,7 +587,7 @@ def booked_food(request):
     }
     return render(request, 'booked_food.html', context)
 
-
+@login_required
 def food_details(request, booking_id):
     if 'email' in request.session:
         booking = Book.objects.get(id=booking_id)
@@ -601,6 +598,7 @@ def food_details(request, booking_id):
 
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
+@login_required
 def serve_food_option(request):
     if 'email' in request.session:
         booking_food_option_id = request.POST.get('booking_food_option_id')
@@ -614,7 +612,7 @@ def serve_food_option(request):
     else:
         return JsonResponse({'success': False, 'message': 'User is not authenticated.'})
 
-
+@login_required
 def food_option_display(request):
     if 'email' in request.session:
         booking_food_options = BookingFoodOption.objects.all()
@@ -625,7 +623,7 @@ def food_option_display(request):
 #filtering
 from django.shortcuts import render
 from .models import BookingFoodOption
-
+@login_required
 def booking_food_options(request):
     served = request.GET.get('served', '')
     if served:
@@ -638,6 +636,7 @@ def booking_food_options(request):
     }
     return render(request, 'food_option_display.html', context)
 
+@login_required
 def search_booking_food_options(request):
     search_value = request.GET.get('search_value', '')
     results = BookingFoodOption.objects.filter(Q(booking__user__email__icontains=search_value) | Q(booking__booking_date__icontains=search_value) | Q(food_option__name__icontains=search_value))
@@ -665,22 +664,27 @@ def search_booking_food_options(request):
 #     return render(request, 'review.html')
 
 
-
+@login_required
 def create_review(request):
     if request.method == 'POST':
         user = request.user
+        print(user)
         review_text = request.POST['review_text']
+        print(review_text)
         rating = request.POST['rating']
-        review = review(user=user, review_text=review_text, rating=rating)
-        review.save()
+        print(rating)
+        reviews = review(user=user, review_text=review_text, rating=rating)
+        reviews.save()
+        print(reviews)
         messages.success(request,"Review successfully added")
-        return redirect('review')
+        return redirect('create_review')
     return render(request, 'review.html')
 
 
 import pickle
 from django.shortcuts import render
 from django.http import JsonResponse
+@login_required
 def home(request):
     if request.method == 'POST':
         season = request.POST.get('season')
@@ -713,24 +717,18 @@ def home(request):
     return render(request, 'home.html')
 
     
-from django.shortcuts import render
-import pandas as pd
-import matplotlib.pyplot as plt
 
+@login_required
 def offers_by_season(request):
-    df = pd.read_csv('predict.csv')
+    predicts = predict.objects.all()
+    df = pd.DataFrame(list(predicts.values()))
     df['visitors'] = df['count_adult'] + df['count_child']
     offers_df = df[['season', 'visitors', 'offers']]
     offers_sum_df = offers_df.groupby('season')['offers'].sum()
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.pie(offers_sum_df.values, labels=offers_sum_df.index, autopct='%1.1f%%', startangle=90)
-    ax.set_title('Offers by Season', fontsize=18)
-    image_path = os.path.join('static', 'pie_chart.png')
-    fig.savefig(image_path)
-    plt.close(fig)
-    return render(request, 'chart.html', {'chart': chart})
-def chart(request):
-    return  render(request, 'chart.html')
+    labels = offers_sum_df.index.tolist()
+    values = offers_sum_df.values.tolist()
+    chart_data = {'labels': labels, 'values': values}
+    return render(request, 'chart.html', {'chart_data': chart_data})
 
 
 
@@ -741,6 +739,7 @@ from django.template.loader import get_template
 from django.conf import settings
 from io import BytesIO
 from .utils import TicketPDF
+@login_required
 def download_ticket(request):
     booking = Book.objects.first()  # Get the first booking instance
     adult_count = booking.count_adult

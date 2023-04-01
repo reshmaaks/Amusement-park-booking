@@ -19,7 +19,8 @@ urlpatterns = [
     # path('admin/', custom_admin_site.urls),
     path('',views.index,name='index'),
     path('home/', views.home, name='home'),
-    path('chart/', views.chart, name='chart'),
+    path('change_password/', views.change_password, name='change_password'),
+    path('offers_by_season/', views.offers_by_season, name='offers_by_season'),
     path('offers_by_season/', views.offers_by_season, name='offers_by_season'),
     path('about/',views.about,name='about'),
     path('contact/',views.contact,name='contact'),
@@ -59,7 +60,7 @@ urlpatterns = [
     path('download_ticket', views.download_ticket, name='download_ticket'),
     path('booking_food_options', views.booking_food_options, name='booking_food_options'),
     path('search/', search_booking_food_options, name='search_booking_food_options'),
-    path('booking/<int:booking_id>/review/create/', views.create_review, name='create_review'),
+    path('create_review/', create_review, name='create_review'),
 
 
 

@@ -4,7 +4,11 @@ from django.db import models
 from django.contrib.auth.models import User
 import datetime
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager ,PermissionsMixin
-from sklearn import model_selection
+
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 class MyAccountManager(BaseUserManager):
     def create_user(self, username, email,phone, password=None):   
         
@@ -57,8 +61,10 @@ class Account(AbstractBaseUser,PermissionsMixin):
         db_table="home_account"
 
     def __str__(self):
+        return self.username
+    def __str__(self):
         return self.email
-
+    
     def has_perm(self, perm, obj=None):
         return self.is_admin
 
@@ -132,7 +138,19 @@ class Adultpackage(models.Model):
     created=models.DateTimeField(auto_now_add=True)
     updated=models.DateTimeField(auto_now=True)
     def __str__(self):
-        return str(self.name)  
+        return str(self.name) 
+    def clean(self):
+        if self.name.strip() == '':
+            raise ValidationError(_('Name cannot be blank.'))
+        if not self.name.isalpha():
+            raise ValidationError(_('Name can only contain alphabetic characters.'))
+
+    def save(self, *args, **kwargs):
+        if self.price < 0:
+            raise ValidationError(_('Price cannot be negative.'))
+        self.clean()
+        super().save(*args, **kwargs)            
+             
 
 class Childpackage(models.Model):
     p2_id=models.AutoField(primary_key=True)
@@ -143,7 +161,18 @@ class Childpackage(models.Model):
     created=models.DateTimeField(auto_now_add=True)
     updated=models.DateTimeField(auto_now=True)
     def __str__(self):
-        return str(self.name)        
+        return str(self.name)
+    def clean(self):
+        if self.name.strip() == '':
+            raise ValidationError(_('Name cannot be blank.'))
+        if not self.name.isalpha():
+            raise ValidationError(_('Name can only contain alphabetic characters.'))
+
+    def save(self, *args, **kwargs):
+        if self.price < 0:
+            raise ValidationError(_('Price cannot be negative.'))
+        self.clean()
+        super().save(*args, **kwargs)            
         
 
 
@@ -166,6 +195,7 @@ class Placed_Booking(models.Model):
     date = models.DateField(auto_now_add=True)
     count_adult=models.BigIntegerField(default=1)
     count_child=models.BigIntegerField(default=1,null=True)
+    food = models.BooleanField(default=False,null=True)
     total_price=models.BigIntegerField(default=0)
     paid = models.BooleanField(default=False, null=True)
     def __str__(self):
@@ -193,6 +223,9 @@ class Book(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return str(self.user) 
+
+
+        
                
 class BookingFoodOption(models.Model):
     booking = models.ForeignKey(Book, on_delete=models.CASCADE)

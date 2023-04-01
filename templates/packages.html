@@ -364,8 +364,8 @@ content: '\e808';
                         <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
                             <li><a class="dropdown-item" href="{% url 'services' %}">Profile</a></li>
 
-                            <li><a class="dropdown-item" href="#">Book </a></li>
-                            <li><a class="dropdown-item" href="#">Change Password </a></li>
+                            <li><a class="dropdown-item" href="{% url 'booking' %}">Book </a></li>
+                            <li><a class="dropdown-item" href="{% url 'change_password' %}">Change Password </a></li>
                             <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
                         </ul>
                     </li>
@@ -381,6 +381,8 @@ content: '\e808';
 
 
     <div class="lm-tabel">
+    {% for i in obj %}
+
         <div class="lm-item lm-item-2">
             <div class="lm-item-top"><span class="lm-item-title lm-underline">START</span>
                 <div class="lm-item-price"><i class="icon-dollar"></i>0.995</div>
@@ -397,9 +399,10 @@ content: '\e808';
                     <li>Table-service restaurants<i class="icon-ok"></i></li>
                     <li> allergen-free food options<i class="icon-ok"></i></li>
                 </ul>
+
                 {% if request.user.is_authenticated %}
                 <div class="lm-item-link">
-                    <a href="{% url 'dashboard' %}">
+                    <a href="{% url 'booking' %}">
                         <svg width="152" height="52" xmlns="http://www.w3.org/2000/svg">
                             <defs>
                                 <linearGradient id="lm-gr-2" x1="0" y1="0" x2="100%" y2="100%">
@@ -429,9 +432,15 @@ content: '\e808';
                 </div>
             {% endif %}
             </div>
+            
             <div class="lm-item-bottom"></div>
+            
         </div>
+        
+{% endfor %}
+        
 
+        
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script>
         (function() {

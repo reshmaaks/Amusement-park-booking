@@ -1,97 +1,7 @@
-<!DOCTYPE html>
-<html>
+
+
 <head>
-	<title>Amusement Park Prediction</title>
-	<style>
-		body {
-			/* background-color: rgb(47, 47, 47); */
-			background-image: url("https://th.bing.com/th/id/R.97fa8e3749d7d8f5baf77dd8e67caf83?rik=mkNSicah1pPb3Q&riu=http%3a%2f%2fwallpapersdsc.net%2fwp-content%2fuploads%2f2017%2f04%2fAmusement-Park-Download-Free-Backgrounds-HD.jpg&ehk=IyaYg5U4FmFkCVrOGzqLo2vgaIHmyTh8t2JfG69ftTA%3d&risl=&pid=ImgRaw&r=0"); /* replace with your own image URL */
-			background-size: cover;
-			background-position: center;
-		}
-		
-		.container {
-			
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			height: 80vh;
-		}
-		
-		h1 {
-			color: white;
-			font-size: 3rem;
-			margin-bottom: 2rem;
-			text-align: center;
-		}
-		
-		form {
-			width: 40% ;
-
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			background-color: rgba(11, 11, 11, 0.8);
-			border-radius: 10px;
-			padding: 2rem;
-			box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.4);
-		}
-		
-		form label {
-			color: rgb(254, 248, 248);
-			font-size: 1.5rem;
-			margin-bottom: 1rem;
-			text-align: center;
-		}
-		
-		form select, form input {
-			font-size: 1.5rem;
-			padding: 1rem;
-			margin-bottom: 2rem;
-			border: none;
-			border-radius: 5px;
-			box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-			width: 100%;
-			max-width: 400px;
-		}
-		
-		form button {
-			background-color: #2196F3;
-			color: white;
-			font-size: 1.5rem;
-			padding: 1rem 2rem;
-			border: none;
-			border-radius: 5px;
-			box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-			cursor: pointer;
-			transition: background-color 0.2s ease-in-out;
-		}
-		
-		form button:hover {
-			background-color: #0D47A1;
-		}
-		.result-section {
-	margin-top: 3rem;
-	border: 1px solid rgb(255, 255, 255);
-	padding: 1rem;
-	border-radius: 5px;
-	background-color: #f2f2f2;
-	}
-
-	.result-section h2 {
-		color: #f2f2f2;
-		font-size: 2rem;
-		margin-bottom: 1rem;
-	}
-
-	.result-section p {
-		font-size: 1.5rem;
-		margin-bottom: 0;
-	}
-
-
-	</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -247,7 +157,6 @@
 							</div>
 						</li>
 					{% endif %}
-	
 					<li class="nav-item dropdown">
 						<a class="nav-link btn" data-toggle="dropdown" href="#" title="{{ request.user }}">
 							<i class="far fa-user" aria-hidden="true"></i>
@@ -280,13 +189,11 @@
 			{% block sidebar %}
 			{% if jazzmin_settings.show_sidebar %}
 				{% get_side_menu as side_menu_list %}
-	
 				<aside class="main-sidebar elevation-4 {{ jazzmin_ui.sidebar_classes }}" id="jazzy-sidebar">
 					<a href="{% url 'admin:index' %}" class="brand-link {{ jazzmin_ui.brand_classes }}" id="jazzy-logo">
 						<img src="{% static jazzmin_settings.site_logo %}" alt="{{ jazzmin_settings.site_header }} Logo" class="{{ jazzmin_settings.site_logo_classes }} brand-image elevation-3" style="opacity: .8">
 						<span class="brand-text font-weight-light">{{ jazzmin_settings.site_brand }}</span>
 					</a>
-	
 					<div class="sidebar">
 						<div class="user-panel mt-3 pb-3 mb-3 d-flex">
 							<div class="image">
@@ -304,7 +211,6 @@
 								{% endif %}
 							</div>
 						</div>
-	
 						<nav class="mt-2">
 							<ul class="nav nav-pills nav-sidebar flex-column {{ jazzmin_ui.sidebar_list_classes }}" data-widget="treeview" role="menu" data-collapsible="false">
 	
@@ -320,8 +226,6 @@
 										<p>{% trans 'Prediction' %}</p>
 									</a>
 								</li>
-	
-								<!-- <a href="http://127.0.0.1:8000/home" class="fas fa-th-large "> Prediction</a> -->
 								{% if jazzmin_settings.navigation_expanded %}
 									{% for app in side_menu_list %}
 										<li class="nav-header">{{ app.name }}</li>
@@ -367,7 +271,6 @@
 			{% endif %}
 			{% endblock %}
 		{% endif %}
-	
 		<div class="content-wrapper" {% if is_popup %}style="margin-left:0px; padding-top: 20px;"{% endif %}>
 			{% block page_content %}
 				{% if not is_popup %}
@@ -383,7 +286,6 @@
 					</div>
 				</div>
 				{% endif %}
-	
 				<div class="content">
 					<div class="container-fluid">
 						<section id="content" class="content">
@@ -417,80 +319,109 @@
 								{% endfor %}
 							{% endblock messages %}
 							<div class="row">
-								
-
-{% block content %}
-  <img src="data:image/png;base64,{{ chart }}" alt="Pie Chart" />
-  {% endblock %}
-</div>
-</section>
-</div>
-</div>
-
-
-{% endblock %}
-</div>
-
-{% block footer %}
-{% if not is_popup %}
-<footer class="main-footer {{ jazzmin_ui.footer_classes }}">
-<div class="float-right d-none d-sm-inline">
-<b>{% trans 'Jazzmin version' %}</b> {% get_jazzmin_version %}
-</div>
-{% autoescape off %}
-<strong>{% trans 'Copyright' %} &copy; {% now 'Y' %} {{ jazzmin_settings.copyright }}.</strong> {% trans 'All rights reserved.' %}
-{% endautoescape %}
-</footer>
-{% if jazzmin_settings.show_ui_builder %}
-{% include 'jazzmin/includes/ui_builder_panel.html' %}
-{% endif %}
-{% endif %}
-{% endblock %}
-
-</div>
-
-{% if jazzmin_settings.show_ui_builder %}
-<div id="codeBox" class="modal fade" role="dialog">
-<div class="modal-dialog">
-<div class="modal-content">
-<div class="modal-header">
-<h4 class="modal-title">{% trans 'UI Configuration' %}</h4>
-<button type="button" class="close" data-dismiss="modal">&times;</button>
-</div>
-<div class="modal-body">
-<p>{% trans 'Copy this info your settings file to persist these UI changes' %}</p>
-<pre><code></code></pre>
-</div>
-<div class="modal-footer">
-<button type="button" class="btn {{ jazzmin_ui.button_classes.danger }}" data-dismiss="modal">{% trans 'Close' %}</button>
-</div>
-</div>
-
-</div>
-</div>
-{% endif %}
-
-<!-- jQuery -->
-<script src="{% static "admin/js/vendor/jquery/jquery.js" %}"></script>
-<!-- Bootstrap 4 -->
-<script src="{% static "vendor/bootstrap/js/bootstrap.min.js" %}"></script>
-<!-- AdminLTE App -->
-<script src="{% static "vendor/adminlte/js/adminlte.min.js" %}"></script>
-<!-- Django customisations -->
-<script src="{% static "jazzmin/js/main.js" %}"></script>
-
-{% if jazzmin_settings.custom_js %}
-<script src="{% static jazzmin_settings.custom_js %}"></script>
-{% endif %}
-
-{% if jazzmin_settings.show_ui_builder %}
-<script>
-window.ui_changes = { jazzmin_ui,raw,as_json,safe };
-</script>
-<script src="{% static "jazzmin/js/ui-builder.js" %}"></script>
-{% endif %}
-
-{% block extrajs %}{% endblock %}
+								{% block content %}
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<div style="max-width: 600px; margin: 0 auto;">
+							<canvas id="chart" style="width: 100%; height: 600px;"></canvas>
+							</div>
+						<script>
+						var chartData = {{ chart_data|safe }};
+						var ctx = document.getElementById('chart').getContext('2d');
+						var chart = new Chart(ctx, {
+							type: 'pie',
+							data: {
+							labels: chartData.labels,
+							datasets: [{
+								label: 'Offers by Season',
+								data: chartData.values,
+								backgroundColor: [
+								'#FF6384',
+								'#36A2EB',
+								'#FFCE56',
+								'#4BC0C0',
+								'#9966FF',
+								'#FF9933',
+								'#4DB6AC',
+								]
+							}]
+							},
+							options: {
+							legend: {
+								display: false
+							},
+							scales: {
+								yAxes: [{
+								ticks: {
+									beginAtZero: true
+								}
+								}]
+							}
+							}
+						});
+						</script>
+				{% endblock %}
+				</div>{% endblock %}
+				</div>
+				</section>
+				</div>
+				</div>
+				{% block footer %}
+				{% if not is_popup %}
+				<footer class="main-footer {{ jazzmin_ui.footer_classes }}">
+				<div class="float-right d-none d-sm-inline">
+				<b>{% trans 'Jazzmin version' %}</b> {% get_jazzmin_version %}
+				</div>
+				{% autoescape off %}
+				<strong>{% trans 'Copyright' %} &copy; {% now 'Y' %} {{ jazzmin_settings.copyright }}.</strong> {% trans 'All rights reserved.' %}
+				{% endautoescape %}
+				</footer>
+				{% if jazzmin_settings.show_ui_builder %}
+				{% include 'jazzmin/includes/ui_builder_panel.html' %}
+				{% endif %}
+				{% endif %}
+				{% endblock %}
+				</div>
+				{% if jazzmin_settings.show_ui_builder %}
+				<div id="codeBox" class="modal fade" role="dialog">
+				<div class="modal-dialog">
+				<div class="modal-content">
+				<div class="modal-header">
+				<h4 class="modal-title">{% trans 'UI Configuration' %}</h4>
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+				<p>{% trans 'Copy this info your settings file to persist these UI changes' %}</p>
+				<pre><code></code></pre>
+				</div>
+				<div class="modal-footer">
+				<button type="button" class="btn {{ jazzmin_ui.button_classes.danger }}" data-dismiss="modal">{% trans 'Close' %}</button>
+				</div>
+				</div>
+				</div>
+				</div>
+				{% endif %}
+				<script src="{% static "admin/js/vendor/jquery/jquery.js" %}"></script>
+				<script src="{% static "vendor/bootstrap/js/bootstrap.min.js" %}"></script>
+				<script src="{% static "vendor/adminlte/js/adminlte.min.js" %}"></script>
+				<script src="{% static "jazzmin/js/main.js" %}"></script>
+				{% if jazzmin_settings.custom_js %}
+				<script src="{% static jazzmin_settings.custom_js %}"></script>
+				{% endif %}
+				{% if jazzmin_settings.show_ui_builder %}
+				<script>
+				window.ui_changes = { jazzmin_ui,raw,as_json,safe };
+				</script>
+				<script src="{% static "jazzmin/js/ui-builder.js" %}"></script>
+				{% endif %}
+				{% block extrajs %}{% endblock %}
 
 </body>
 </html>
