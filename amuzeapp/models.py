@@ -255,11 +255,28 @@ class Offer(models.Model):
 class BookingLimit(models.Model):
     max_bookings = models.PositiveIntegerField(default=True)
 
+
+from django.utils.html import format_html
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
 class review(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
-    booking = models.ForeignKey(Book, on_delete=models.CASCADE)
+    booking = models.ForeignKey(Book, on_delete=models.CASCADE,null=True)
     review_text = models.TextField()
     rating = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return str(self.user)
+    def get_sentiment_analysis(self):
+        analyzer = SentimentIntensityAnalyzer()
+        scores = analyzer.polarity_scores(self.review_text)
+        if scores['compound'] >= 0.05:
+            sentiment = 'Positive'
+        elif scores['compound'] <= -0.05:
+            sentiment = 'Negative'
+        else:
+            sentiment = 'Neutral'
+        return format_html("<span style='color:{}'>{}</span>", sentiment_color(sentiment), sentiment)
+
+    def __str__(self):
+        return self.review_text[:50]    

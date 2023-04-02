@@ -139,14 +139,15 @@ def viewlogin(request):
         password=request.POST.get('password')
         print(email)
         user = authenticate(email=email ,password=password)
-        print(user)
-        print(email,password)
-        if user :
+        request.session['email']=email
+        if user.is_admin:
+            return redirect('http://127.0.0.1:8000/admin/')
+        elif user :
             print(email,password)
             auth.login(request, user)
             #save email in session
             request.session['email'] = email
-            return redirect('index')
+            return redirect('index')    
         else:
             print(3)
             messages.success(request,"Invalid Credentials")
@@ -680,7 +681,7 @@ def create_review(request):
         return redirect('create_review')
     return render(request, 'review.html')
 
-
+#ml
 import pickle
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -729,9 +730,6 @@ def offers_by_season(request):
     values = offers_sum_df.values.tolist()
     chart_data = {'labels': labels, 'values': values}
     return render(request, 'chart.html', {'chart_data': chart_data})
-
-
-
 
 
 from django.http import HttpResponse
@@ -796,3 +794,5 @@ def download_ticket(request):
 
 # def ticket(request):
 #     return render(request,ticket.html)
+
+

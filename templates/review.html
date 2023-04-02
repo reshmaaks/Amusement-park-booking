@@ -1,62 +1,58 @@
-<style>
-    .star-rating {
-  display: inline-block;
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit a Review</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .star-rating {
+            display: inline-block;
+            font-size: 1.2em;
+            color: #ffc107;
+        }
+        #submit-review-form label {
+            margin-top: 5%;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
 
-.star-rating i {
-  font-size: 30px;
-  color: gray;
-  transition: color 0.2s ease-in-out;
-  cursor: pointer;
-}
-
-.star-rating i:hover,
-.star-rating i.active {
-  color: orange;
-}
-</style>
-
-<div>
-    <h2>Leave a Review</h2>
-    <p>Enter your review and rate this product:</p>
-    <form id="review-form">
-        {% include 'alert.html' %}
-      <div>
-        <label for="review_text">Review:</label>
-        <textarea id="review_text" name="review_text" placeholder="Write your review"></textarea>
-      </div>
-      <div>
-        <label for="rating">Rating:</label>
-        <div class="star-rating">
-          <i class="fa fa-star" data-rating="1"></i>
-          <i class="fa fa-star" data-rating="2"></i>
-          <i class="fa fa-star" data-rating="3"></i>
-          <i class="fa fa-star" data-rating="4"></i>
-          <i class="fa fa-star" data-rating="5"></i>
+<div class="container">
+    <br>
+    <br>
+    <br>
+    <br>
+    <h1>Submit a Review</h1>
+    <hr>
+    <form id="submit-review-form" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="review-text">Review:</label>
+            <textarea class="form-control" id="review-text" name="review_text" rows="5" required></textarea>
         </div>
-        <script>
-            const stars = document.querySelectorAll('.star-rating i');
-const ratingInput = document.querySelector('#rating');
-
-function handleClick() {
-  const rating = parseInt(this.getAttribute('data-rating'));
-  ratingInput.value = rating;
-  
-  stars.forEach(star => {
-    if (parseInt(star.getAttribute('data-rating')) <= rating) {
-      star.classList.add('active');
-    } else {
-      star.classList.remove('active');
-    }
-  });
-}
-
-stars.forEach(star => star.addEventListener('click', handleClick));
-
-        </script>
-        <input type="hidden" name="rating" id="rating">
-      </div>
-      <button type="submit">Submit</button>
+        <div class="form-group">
+            <label for="rating">Rating:</label>
+            <br>
+            <div class="star-rating">
+                <input type="radio" name="rating" id="rating1" value="1" required>
+                <label for="rating1">&#9734;</label>
+                <input type="radio" name="rating" id="rating2" value="2" required>
+                <label for="rating2">&#9734;</label>
+                <input type="radio" name="rating" id="rating3" value="3" required>
+                <label for="rating3">&#9734;</label>
+                <input type="radio" name="rating" id="rating4" value="4" required>
+                <label for="rating4">&#9734;</label>
+                <input type="radio" name="rating" id="rating5" value="5" required>
+                <label for="rating5">&#9734;</label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-  </div>
-  
+</div>
+</body>
+</html>

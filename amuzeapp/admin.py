@@ -6,6 +6,7 @@ from.models import *
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 
+
 admin.site.unregister(Group)
 class AdultpackageModelAdmin(admin.ModelAdmin):
     list_display = ['p1_id', 'name', 'price', 'available']
@@ -179,3 +180,24 @@ class paymentAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 admin.site.register(Payments,paymentAdmin)
+
+from django.contrib import admin
+from .models import review
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('user', 'review_text', 'rating', 'sentiment')
+
+    def sentiment(self, obj):
+        analyzer = SentimentIntensityAnalyzer()
+        scores = analyzer.polarity_scores(obj.review_text)
+        sentiment_score = scores['compound']
+        if sentiment_score >= 0.05:
+            return 'Positive'
+        elif sentiment_score <= -0.05:
+            return 'Negative'
+        else:
+            return 'Neutral'
+    sentiment.short_description = 'Sentiment Analysis'
+
+admin.site.register(review, ReviewAdmin)
