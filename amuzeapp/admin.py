@@ -18,8 +18,8 @@ admin.site.register(Childpackage,ChildpackageModelAdmin)
 
 @admin.register(BookingLimit)
 class BookingLimitModelAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request, obj=None):
-        return False
+    # def has_add_permission(self, request, obj=None):
+    #     return False
     list_display = ['id', 'max_bookings','date']
     list_editable = ['date','max_bookings']
 
@@ -82,7 +82,7 @@ class itemModelAdmin(admin.ModelAdmin):
     #     return False
     # def has_delete_permission(self, request, obj=None):
     #     return False
-    
+
 def export_reg(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="predict.csv"'

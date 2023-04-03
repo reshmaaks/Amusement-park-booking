@@ -35,7 +35,8 @@ def index(request):
     food1=fooditem.objects.all()
     food2=foodCategory.objects.all()
     food3=Product.objects.all()
-    data = {'product':product, 'categories':categories,'itms':itms ,'food1':food1,'food2':food2,'food3':food3}
+    reviews=review.objects.all()
+    data = {'product':product, 'categories':categories,'itms':itms ,'food1':food1,'food2':food2,'food3':food3,'reviews':reviews}
     return render(request, 'index.html', data)
 
 def indexfood(request):
@@ -76,7 +77,7 @@ def services(request):
     return render(request,'services.html')
 
 def packages(request):
-    if 'email' in request.session:
+    
         obj=Adultpackage.objects.all()
         obj2=Childpackage.objects.all()
         context={
@@ -84,7 +85,7 @@ def packages(request):
             'obj2':obj2
         }
         return render(request,'packages.html',context)
-    return render(request,'index.html')
+    
 
 def register(request):
     if request.method == 'POST':
