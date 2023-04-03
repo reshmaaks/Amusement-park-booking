@@ -112,7 +112,6 @@ class fooditem(models.Model):
 
 class foodCategory(models.Model):
     title = models.CharField(max_length=200,unique=True)
-    # items=models.ForeignKey(fooditem,on_delete=models.CASCADE,null=True)
     category_image = models.ImageField(upload_to='media/f-photo')
 
     def __str__(self):
@@ -238,7 +237,7 @@ class BookingFoodOption(models.Model):
 class predict(models.Model):
     season = models.CharField(max_length=20)
     count_adult=models.BigIntegerField(default=1)
-    count_child=models.BigIntegerField(default=1)
+    count_child=models.BigIntegerField(default=1,null=True)
     offers = models.IntegerField(default=0,null= True)
     def __str__(self):
         return self.season 
@@ -254,7 +253,7 @@ class Offer(models.Model):
 
 class BookingLimit(models.Model):
     max_bookings = models.PositiveIntegerField(default=True)
-
+    date = models.DateField(unique=True,null=True)
 
 from django.utils.html import format_html
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer

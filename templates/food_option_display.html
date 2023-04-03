@@ -27,7 +27,7 @@
 
 /* Style the filter button */
 .btn {
-  margin-left: -1800%;  
+  margin-left: -1750%;  
   margin-bottom: -55%;
   padding: 0.5rem 1rem;
   font-size: 1rem;
@@ -43,11 +43,15 @@
 
     </style>
 </head>
+<br>
 
+<div style="margin-left:1250px">
+<input type="text" id="search-input" placeholder="Search..."> 
+
+</div>
 
     <h1>Booking Food Options</h1>
      
-    <input type="text" id="search-input" placeholder="Search...">
 <script>
     $(document).ready(function() {
   $('#search-input').on('input', function() {
@@ -80,7 +84,7 @@
 
     <form method="GET" action="{% url 'booking_food_options' %}" class="filter-form">
         <div class="form-group">
-            <label for="served">Served:</label>
+            <label for="served"></label>
             <select id="served" name="served" class="form-control">
                 <option value="" selected disabled>Select</option>
                 <option value="">All</option>

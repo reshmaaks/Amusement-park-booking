@@ -228,7 +228,6 @@
 		<div class="col-md-8 offset-md-2 booking-form">
 			<h2>				Booking Form</h2>
 			<form   action="{% url 'booking' %}" method="POST" >
-         {% include 'alert.html' %}
 				{% csrf_token %}
 				<div class="form-group">
 					<label for="date">Select Date:</label>
@@ -248,17 +247,18 @@
                         {% endif %}
                     </select>
                 </div>
-                <label for="adults">Number of Adults:</label>
-			<div class="quantity">
-				<button id="minus-btn-adults" type="button">-</button>
-				<input type="text" id="adults" name="count1" value="1">
-				<button id="plus-btn-adults" type="button">+</button>
-			</div><br>
+				
+            <label for="adults">Number of Adults:</label>
+				<div class="quantity">
+					<button id="minus-btn-adults" type="button">-</button>
+					<input type="text" id="adults" name="count1" value="1">
+					<button id="plus-btn-adults" type="button">+</button>
+				</div><br>
 
                 <div class="form-group">
                     <label for="adult-package">Select Child Package:</label>
                     <select class="form-control" id="child-package" name="p2_id">
-                        <option value="" selected disabled>Select Child Package</option> <!-- Default "Select" option -->
+                        <!-- <option value="" selected disabled>Select Child Package</option> Default "Select" option -->
                         {% if child_packages %}
                             {% for package in child_packages %}
                                 <option value="{{ package.p2_id }}" data-price="{{ package.price }}">{{ package.name }} - ${{ package.price }}</option>
@@ -267,8 +267,8 @@
                             <option value="" disabled>No Child packages available</option>
                         {% endif %}
                     </select>
+					<p style="font-size: 10px; color: brown;">Child ticket is applicable for kids whose height is between 85 cms and 140 cms.</p>
                 </div>
-
 				
 			
 			<label for="children">Number of Children:</label>
@@ -456,31 +456,31 @@ document.getElementById("minus-btn-children").addEventListener("click", function
     }
 });
 
-        // const dateInput = document.getElementById('date');
+        const dateInput = document.getElementById('date');
 
-        // // Get the current date
-        // const today = new Date();
-        // today.setHours(0, 0, 0, 0);
-        // const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+        // Get the current date
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
 
-        // // Add a change event listener to the date input
-        // dateInput.addEventListener('change', () => {
-        // // Get the selected date
-        // const selectedDate = new Date(dateInput.value);
+        // Add a change event listener to the date input
+        dateInput.addEventListener('change', () => {
+        // Get the selected date
+        const selectedDate = new Date(dateInput.value);
 
-        // // Check if the selected date is valid
-        // if (selectedDate < tomorrow) {
-        //     // Display an error message
-        //     const dateError = document.getElementById('date-error');
-        //     dateError.classList.remove('d-none');
-        //     dateInput.setCustomValidity('Please select a date from tomorrow onwards.');
-        // } else {
-        //     // Hide the error message
-        //     const dateError = document.getElementById('date-error');
-        //     dateError.classList.add('d-none');
-        //     dateInput.setCustomValidity('');
-        // }
-        // });
+        // Check if the selected date is valid
+        if (selectedDate < tomorrow) {
+            // Display an error message
+            const dateError = document.getElementById('date-error');
+            dateError.classList.remove('d-none');
+            dateInput.setCustomValidity('Please select a date from tomorrow onwards.');
+        } else {
+            // Hide the error message
+            const dateError = document.getElementById('date-error');
+            dateError.classList.add('d-none');
+            dateInput.setCustomValidity('');
+        }
+        });
 
 	$(document).ready(function() {
 		$('.select2').select2();

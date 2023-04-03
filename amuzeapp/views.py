@@ -140,9 +140,7 @@ def viewlogin(request):
         print(email)
         user = authenticate(email=email ,password=password)
         request.session['email']=email
-        if user.is_admin:
-            return redirect('http://127.0.0.1:8000/admin/')
-        elif user :
+        if user :
             print(email,password)
             auth.login(request, user)
             #save email in session
@@ -280,10 +278,9 @@ def add_food_category(request):
         if request.method == 'POST':
             title = request.POST.get('title')
             category_image = request.FILES.get('category_image')
-            item_id = request.POST.get('item_id')
-            if title and category_image and item_id:
-                item_instance = get_object_or_404(fooditem, pk=item_id)
-                category = foodCategory.objects.create(title=title, category_image=category_image, items=item_instance)
+            # item_id = request.POST.get('item_id')
+            if title and category_image:
+                category = foodCategory.objects.create(title=title, category_image=category_image)
                 return redirect('food_category_dis')
             else:
                 return HttpResponseBadRequest('Title, category image, and item ID are required')
@@ -297,13 +294,10 @@ def edit_food_category(request, pk):
         if request.method == 'POST':
             title = request.POST.get('title')
             category_image = request.FILES.get('category_image')
-            item_id = request.POST.get('item_id')
-            if title and item_id:
-                item_instance = get_object_or_404(fooditem, pk=item_id)
+            if title:
                 category.title = title
                 if category_image:
                     category.category_image = category_image
-                category.items = item_instance
                 category.save()
                 return redirect('food_category_dis')
             else:
@@ -313,7 +307,7 @@ def edit_food_category(request, pk):
     return redirect('dashboard')
 
 
-@login_required
+
 def food_category_dis(request):
     if 'email' in request.session:
         data=foodCategory.objects.all()
@@ -330,7 +324,6 @@ def food_category_dis(request):
 #     return render(request, 'food_category_dis.html')    
 
 
-@login_required
 def delete_food_category(request,id):
     if 'email' in request.session:
         category=foodCategory.objects.filter(id=id)
@@ -379,9 +372,11 @@ def booking(request):
         if p1 is None:
             messages.error(request, 'Invalid package selected.')
             return redirect('booking')
-        booking_limit = BookingLimit.objects.first()
+        booking_limit = BookingLimit.objects.filter(date=date).first()
+        if not booking_limit:
+            booking_limit = BookingLimit.objects.create(date=date)
         max_bookings = booking_limit.max_bookings
-        num_bookings_today = Book.objects.filter(date=date).count()
+        num_bookings_today = Placed_Booking.objects.filter(date=date).count()
         if num_bookings_today >= max_bookings:
             messages.error(request, 'Maximum number of bookings reached for today.')
             return redirect('booking')    
@@ -411,76 +406,70 @@ def booking(request):
     return render(request, 'booking.html', {'adult_packages': adult_packages, 'child_packages': child_packages,'food_options': food_options})
 
 from django.db.models import Q
-
 @login_required 
 def checkout(request, booking_id):
-    # if request.method == 'POST':
-        latest_booking = Book.objects.get(id=booking_id)
-        active_offers = Offer.objects.filter(active=True)
-        booking_food_options = latest_booking.bookingfoodoption_set.all()
-        applied_offers_count = 0
-        eligible_offers = []
-        for offer in active_offers:
-            if offer.count_adult is not None and latest_booking.count_adult >= offer.count_adult:
-                adult_offers = active_offers.filter(count_adult__lte=latest_booking.count_adult)
-                for adult_offer in adult_offers:
-                    if adult_offer not in eligible_offers:
-                        eligible_offers.append(adult_offer)
-                        applied_offers_count += 1
-            if offer.count_child is not None and latest_booking.count_child >= offer.count_child:
-                child_offers = active_offers.filter(count_child__lte=latest_booking.count_child)
-                for child_offer in child_offers:
-                    if child_offer not in eligible_offers:
-                        eligible_offers.append(child_offer)
-                        applied_offers_count += 1
-        if 'discount_applied' not in request.session:
-            for offer in eligible_offers:
-                discount = (latest_booking.total_price * offer.discount_percentage) / 100
-                latest_booking.total_price -= discount
-            request.session['discount_applied'] = True
-            # print(offer.discount_percentage)
-        print(offer.discount_percentage)
-        pred=predict.objects.create(season=latest_booking.season,count_adult=latest_booking.count_adult,count_child=latest_booking.count_child,offers=offer.discount_percentage)
-        # pred=predict.objects.create(offers=offer.discount_percentage)
-        pred.save()    
-        latest_booking.applied_offers = applied_offers_count
-        latest_booking.total_price = int(latest_booking.total_price)
+    latest_booking = Book.objects.get(id=booking_id)
+    active_offers = Offer.objects.filter(active=True)
+    booking_food_options = latest_booking.bookingfoodoption_set.all()
+    applied_offers_count = 0
+    eligible_offers = []
+    for offer in active_offers:
+        if offer.count_adult is not None and latest_booking.count_adult >= offer.count_adult:
+            adult_offers = active_offers.filter(count_adult__lte=latest_booking.count_adult)
+            for adult_offer in adult_offers:
+                if adult_offer not in eligible_offers:
+                    eligible_offers.append(adult_offer)
+                    applied_offers_count += 1
+        if offer.count_child is not None and latest_booking.count_child >= offer.count_child:
+            child_offers = active_offers.filter(count_child__lte=latest_booking.count_child)
+            for child_offer in child_offers:
+                if child_offer not in eligible_offers:
+                    eligible_offers.append(child_offer)
+                    applied_offers_count += 1
 
-        client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET_KEY))
-        data = {
-            'amount': latest_booking.total_price * 100,  # Convert to paise
-            'currency': 'INR',
-            'receipt': str(latest_booking.id),
-            'payment_capture': 1,
-        }
-        order = client.order.create(data=data)
-        order_id = order['id']
-        print(order_id)
-        request.session['order_id'] = order_id
-        print(order_id)
-        request.session['booking_id'] = booking_id
-        order_status = order['status']
-        if order_status == 'created':
-            payment = Payments.objects.create(
-                user=latest_booking.user,
-                amount=latest_booking.total_price,
-                razorpay_order_id=order_id,
-                razorpay_payment_status=order_status,
-            )
-            latest_booking.payment = payment
-            latest_booking.save()
-            # return render(request,'success.html')
+    for offer in eligible_offers:
+        discount = (latest_booking.total_price * offer.discount_percentage) / 100
+        latest_booking.total_price -= discount
 
-        context = {
-            'booking_food_options': booking_food_options,
-            'latest_booking': latest_booking,
-            'eligible_offers': eligible_offers,
-            'order_id': order_id
-        }
+    latest_booking.applied_offers = applied_offers_count
+    latest_booking.total_price = int(latest_booking.total_price)
 
-        return render(request, 'checkout.html', context)
-    
+    if 'discount_applied' not in request.session:
+        request.session['discount_applied'] = True
 
+    client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET_KEY))
+    data = {
+        'amount': latest_booking.total_price * 100,  
+        'currency': 'INR',
+        'receipt': str(latest_booking.id),
+        'payment_capture': 1,
+    }
+    order = client.order.create(data=data)
+    order_id = order['id']
+    print(order_id)
+    request.session['order_id'] = order_id
+    print(order_id)
+    request.session['booking_id'] = booking_id
+    order_status = order['status']
+    if order_status == 'created':
+        payment = Payments.objects.create(
+            user=latest_booking.user,
+            amount=latest_booking.total_price,
+            razorpay_order_id=order_id,
+            razorpay_payment_status=order_status,
+        )
+        latest_booking.payment = payment
+        latest_booking.save()
+        # return render(request,'success.html')
+
+    context = {
+        'booking_food_options': booking_food_options,
+        'latest_booking': latest_booking,
+        'eligible_offers': eligible_offers,
+        'order_id': order_id
+    }
+
+    return render(request, 'checkout.html', context)
 
 @login_required
 def paymentdone(request):
@@ -512,7 +501,6 @@ def paymentdone(request):
             return render(request,'paymentdone.html')
         return redirect(booking)
 
-@login_required
 def item_add(request):
     if 'email' in request.session:
         if request.method == 'POST':
@@ -538,7 +526,7 @@ def item_add(request):
             return render(request, 'item_add.html', {'obj':obj, 'items': categories})
     return redirect(dashboard)
 
-@login_required
+
 def item_view(request):
     if 'email' in request.session:
         data=Product.objects.all()
@@ -546,7 +534,7 @@ def item_view(request):
         return render(request,'item_view.html',context)
     return redirect(dashboard)
 
-@login_required
+
 def delete_item_view(request,id):
     if 'email' in request.session:
         category=Product.objects.filter(id=id)
@@ -555,7 +543,7 @@ def delete_item_view(request,id):
         return redirect(item_view)  
     # return redirect(dashboard)
     return HttpResponse("Please Login") 
-@login_required
+
 def edit_item(request, pk):
     product = get_object_or_404(Product, pk=pk)
     if request.method == 'POST':
@@ -579,7 +567,6 @@ def edit_item(request, pk):
         return render(request, 'edit_item.html', {'product': product, 'categories': categories})
 
 from django.utils import timezone
-@login_required
 def booked_food(request):
     today = timezone.now().date() # get today's date in timezone
     bookings_today = Book.objects.filter(date__exact=today, food=True) # filter only food bookings
@@ -588,7 +575,7 @@ def booked_food(request):
     }
     return render(request, 'booked_food.html', context)
 
-@login_required
+
 def food_details(request, booking_id):
     if 'email' in request.session:
         booking = Book.objects.get(id=booking_id)
@@ -599,7 +586,7 @@ def food_details(request, booking_id):
 
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
-@login_required
+
 def serve_food_option(request):
     if 'email' in request.session:
         booking_food_option_id = request.POST.get('booking_food_option_id')
@@ -613,7 +600,6 @@ def serve_food_option(request):
     else:
         return JsonResponse({'success': False, 'message': 'User is not authenticated.'})
 
-@login_required
 def food_option_display(request):
     if 'email' in request.session:
         booking_food_options = BookingFoodOption.objects.all()
@@ -624,7 +610,7 @@ def food_option_display(request):
 #filtering
 from django.shortcuts import render
 from .models import BookingFoodOption
-@login_required
+
 def booking_food_options(request):
     served = request.GET.get('served', '')
     if served:
@@ -637,7 +623,7 @@ def booking_food_options(request):
     }
     return render(request, 'food_option_display.html', context)
 
-@login_required
+
 def search_booking_food_options(request):
     search_value = request.GET.get('search_value', '')
     results = BookingFoodOption.objects.filter(Q(booking__user__email__icontains=search_value) | Q(booking__booking_date__icontains=search_value) | Q(food_option__name__icontains=search_value))
@@ -653,19 +639,6 @@ def search_booking_food_options(request):
     return JsonResponse({'results': search_results})
 
 
-# def lktj(request):
-#     if request.method == 'POST':
-#         user = request.user
-#         review_text = request.POST['review_text']
-#         rating = request.POST['rating']
-#         reviews = review(user=user, review_text=review_text, rating=rating)
-#         reviews.save()
-#         messages.success(request,"Successfully Added")
-#         return redirect('create_review')
-#     return render(request, 'review.html')
-
-
-@login_required
 def create_review(request):
     if request.method == 'POST':
         user = request.user
