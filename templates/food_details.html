@@ -9,7 +9,7 @@
                 <thead class="thead-dark">
                   <tr>
                     <th scope="col">Food Item</th>
-                    <th scope="col">Brand</th>
+                    <!-- <th scope="col">Brand</th> -->
                     <th scope="col">Veg/Non-veg</th>
                     <th scope="col">Quantity</th>
                     <th scope="col">Status</th>
@@ -20,7 +20,7 @@
                   {% for food_option in food_options %}
                     <tr>
                       <td>{{ food_option.food_option.name }}</td>
-                      <td>{{ food_option.food_option.brand.brandname }}</td>
+                      <!-- <td>{{ food_option.food_option.brand.brandname }}</td> -->
                       <td>{{ food_option.food_option.cat.title }}</td>
 
 

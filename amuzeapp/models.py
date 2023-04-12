@@ -104,11 +104,11 @@ class Category(models.Model):
     def __str__(self):
         return self.title
 
-class fooditem(models.Model):
-    brandname = models.CharField(max_length=200, unique=True)
-    image = models.ImageField(upload_to='media/cat-photo')
-    def __str__(self):
-        return self.brandname       
+# class fooditem(models.Model):
+#     brandname = models.CharField(max_length=200, unique=True)
+#     image = models.ImageField(upload_to='media/cat-photo')
+#     def __str__(self):
+#         return self.brandname       
 
 class foodCategory(models.Model):
     title = models.CharField(max_length=200,unique=True)
@@ -120,12 +120,11 @@ class foodCategory(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=200,unique=True)
     cat = models.ForeignKey(foodCategory, on_delete=models.CASCADE)
-    brand = models.ForeignKey(fooditem,on_delete=models.CASCADE,null=True)
+    # brand = models.ForeignKey(fooditem,on_delete=models.CASCADE,null=True)
     product_image = models.ImageField(upload_to='media/p-image')
     # marked_price = models.PositiveIntegerField()
     selling_price = models.PositiveIntegerField(null=True)
     # stock=models.IntegerField(default=True)
-
     def __str__(self):
         return self.name        
 
@@ -143,14 +142,12 @@ class Adultpackage(models.Model):
             raise ValidationError(_('Name cannot be blank.'))
         if not self.name.isalpha():
             raise ValidationError(_('Name can only contain alphabetic characters.'))
-
     def save(self, *args, **kwargs):
         if self.price < 0:
             raise ValidationError(_('Price cannot be negative.'))
         self.clean()
         super().save(*args, **kwargs)            
              
-
 class Childpackage(models.Model):
     p2_id=models.AutoField(primary_key=True)
     name=models.CharField(max_length=250,unique=True)
@@ -166,16 +163,12 @@ class Childpackage(models.Model):
             raise ValidationError(_('Name cannot be blank.'))
         if not self.name.isalpha():
             raise ValidationError(_('Name can only contain alphabetic characters.'))
-
     def save(self, *args, **kwargs):
         if self.price < 0:
             raise ValidationError(_('Price cannot be negative.'))
         self.clean()
         super().save(*args, **kwargs)            
         
-
-
-
 class Payments(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE,null=True)
     # name = models.CharField(max_length=100)

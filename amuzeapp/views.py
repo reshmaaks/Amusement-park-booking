@@ -32,18 +32,18 @@ def index(request):
     product = Product.objects.all()
     categories = Category.objects.all()
     itms = item.objects.all()
-    food1=fooditem.objects.all()
+    # food1=fooditem.objects.all()
     food2=foodCategory.objects.all()
     food3=Product.objects.all()
     reviews=review.objects.all()
-    data = {'product':product, 'categories':categories,'itms':itms ,'food1':food1,'food2':food2,'food3':food3,'reviews':reviews}
+    data = {'product':product, 'categories':categories,'itms':itms ,'food2':food2,'food3':food3,'reviews':reviews}
     return render(request, 'index.html', data)
 
 def indexfood(request):
     food2=foodCategory.objects.all()
     food3=Product.objects.all()
-    food1=fooditem.objects.all()
-    data = {'food1':food1,'food2':food2,'food3':food3}
+    # food1=fooditem.objects.all()
+    data = {'food2':food2,'food3':food3}
     return render(request, 'indexfood.html', data)
 
 def showitem(request, iid):
@@ -51,10 +51,9 @@ def showitem(request, iid):
     its = item.objects.get(pk=iid)
     food2=foodCategory.objects.all()
     food3=Product.objects.all()
-    food1=fooditem.objects.all()
+    
     categories = Category.objects.filter(items=its)
     data = {
-        'food1':food1,
         'food2':food2,
         'food3':food3,
         'categories':categories
@@ -227,52 +226,52 @@ def foodlogout(request):
         request.session.flush()
     return redirect(index)    
 
-def foodadd(request):
-    if 'email' in request.session:
+# def foodadd(request):
+#     if 'email' in request.session:
 
-        if request.method == 'POST':
-            brandname = request.POST.get('brandname')
-            image = request.FILES.get('image')
-            print(image)
-            food_item = fooditem(brandname=brandname, image=image)
-            food_item.save()
-            messages.success(request, 'Food item added successfully!')
-            return redirect('foodadd')
-        else:
-            return render(request, 'foodadd.html')
-    return redirect(dashboard)    
+#         if request.method == 'POST':
+#             brandname = request.POST.get('brandname')
+#             image = request.FILES.get('image')
+#             print(image)
+#             food_item = fooditem(brandname=brandname, image=image)
+#             food_item.save()
+#             messages.success(request, 'Food item added successfully!')
+#             return redirect('foodadd')
+#         else:
+#             return render(request, 'foodadd.html')
+#     return redirect(dashboard)    
 
-def food_dis(request):
-    if 'email' in request.session:
-        data=fooditem.objects.all()
-        context={'data': data}
-        return render(request,'food_dis.html',context)
-    return redirect(dashboard)    
+# def food_dis(request):
+#     if 'email' in request.session:
+#         data=fooditem.objects.all()
+#         context={'data': data}
+#         return render(request,'food_dis.html',context)
+#     return redirect(dashboard)    
         
-def Delete(request,id):
-    if 'email' in request.session:
-        food=fooditem.objects.filter(id=id)
-        food.delete()
-        messages.info(request,"Deleted")
-        return redirect(food_dis)        
-    return redirect(dashboard)    
+# def Delete(request,id):
+#     if 'email' in request.session:
+#         food=fooditem.objects.filter(id=id)
+#         food.delete()
+#         messages.info(request,"Deleted")
+#         return redirect(food_dis)        
+#     return redirect(dashboard)    
 
-def edit_food_item(request, pk):
-    if 'email' in request.session:
-        item = get_object_or_404(fooditem, pk=pk)
+# def edit_food_item(request, pk):
+#     if 'email' in request.session:
+#         item = get_object_or_404(fooditem, pk=pk)
 
-        if request.method == 'POST':
-            # If the request method is POST, update the fooditem object with the new data
-            item.brandname = request.POST['brandname']
-            item.image = request.FILES['image']
-            item.save()
+#         if request.method == 'POST':
+#             # If the request method is POST, update the fooditem object with the new data
+#             item.brandname = request.POST['brandname']
+#             item.image = request.FILES['image']
+#             item.save()
 
-            # Redirect to the fooditem detail page after editing the fooditem object
-            return redirect('food_dis')
-        else:
-            # If the request method is GET, render the edit fooditem form with the current data
-            return render(request, 'edit_food_item.html', {'item': item}) 
-    return redirect(dashboard)
+#             # Redirect to the fooditem detail page after editing the fooditem object
+#             return redirect('food_dis')
+#         else:
+#             # If the request method is GET, render the edit fooditem form with the current data
+#             return render(request, 'edit_food_item.html', {'item': item}) 
+#     return redirect(dashboard)
 
 def add_food_category(request):
     if 'email' in request.session:
@@ -285,8 +284,8 @@ def add_food_category(request):
                 return redirect('food_category_dis')
             else:
                 return HttpResponseBadRequest('Title, category image, and item ID are required')
-        items = fooditem.objects.all()
-        return render(request, 'add_food_category.html', {'items': items})   
+        # items = fooditem.objects.all()
+        return render(request, 'add_food_category.html')   
     return redirect(dashboard)
     
 def edit_food_category(request, pk):    
@@ -303,8 +302,8 @@ def edit_food_category(request, pk):
                 return redirect('food_category_dis')
             else:
                 return HttpResponseBadRequest('Title and item ID are required')
-        items = fooditem.objects.all()
-        return render(request, 'edit_food_category.html', {'category': category, 'items': items})  
+        # items = fooditem.objects.all()
+        return render(request, 'edit_food_category.html', {'category': category})  
     return redirect('dashboard')
 
 
@@ -481,7 +480,6 @@ def paymentdone(request):
             payment_id = request.GET.get('payment_id', None)
             print(payment_id)
             payment = Payments.objects.get(razorpay_order_id=request.session['order_id'])
-
             payment.razorpay_payment_id=payment_id
             payment.paid=True
             payment.save()
@@ -508,25 +506,20 @@ def item_add(request):
             name = request.POST.get('name')
             product_image = request.FILES.get('product_image')
             cat = request.POST.get('cat')
-            brand = request.POST.get('brand')
-
             selling_price = request.POST.get('selling_price')
             cat = get_object_or_404(foodCategory, pk=cat)
-            brand =get_object_or_404(fooditem, pk=brand)
+            # brand =get_object_or_404(fooditem, pk=brand)
             if name and product_image and cat:
-                product = Product.objects.create(name=name, product_image=product_image, cat=cat,brand=brand, selling_price=selling_price)
+                product = Product.objects.create(name=name, product_image=product_image, cat=cat , selling_price=selling_price)
                 messages.success(request,"Added Successfully")
-
                 return redirect('item_view')
             else:
                 return HttpResponseBadRequest('Name, image, and category are required')
         else:
             categories = foodCategory.objects.all()
-            obj = fooditem.objects.all()
-
-            return render(request, 'item_add.html', {'obj':obj, 'items': categories})
+            # obj = fooditem.objects.all()
+            return render(request, 'item_add.html', {'items': categories})
     return redirect(dashboard)
-
 
 def item_view(request):
     if 'email' in request.session:
@@ -535,14 +528,12 @@ def item_view(request):
         return render(request,'item_view.html',context)
     return redirect(dashboard)
 
-
 def delete_item_view(request,id):
     if 'email' in request.session:
         category=Product.objects.filter(id=id)
         category.delete()
         messages.info(request,"Deleted")
         return redirect(item_view)  
-    # return redirect(dashboard)
     return HttpResponse("Please Login") 
 
 def edit_item(request, pk):
@@ -576,7 +567,6 @@ def booked_food(request):
     }
     return render(request, 'booked_food.html', context)
 
-
 def food_details(request, booking_id):
     if 'email' in request.session:
         booking = Book.objects.get(id=booking_id)
@@ -605,9 +595,8 @@ def food_option_display(request):
     if 'email' in request.session:
         booking_food_options = BookingFoodOption.objects.all()
         return render(request, 'food_option_display.html', {'booking_food_options': booking_food_options})
-    else:
-        return redirect('login')
-
+    
+    return redirect('index')
 #filtering
 from django.shortcuts import render
 from .models import BookingFoodOption
@@ -624,20 +613,32 @@ def booking_food_options(request):
     }
     return render(request, 'food_option_display.html', context)
 
-
 def search_booking_food_options(request):
     search_value = request.GET.get('search_value', '')
-    results = BookingFoodOption.objects.filter(Q(booking__user__email__icontains=search_value) | Q(booking__booking_date__icontains=search_value) | Q(food_option__name__icontains=search_value))
+    booking_id = request.GET.get('booking_id', '')
+    email = request.GET.get('email', '')
+    date = request.GET.get('date', '')
+    
+    results = BookingFoodOption.objects.filter(
+        Q(booking__user__email__icontains=search_value) | 
+        Q(booking__date__icontains=search_value) |
+        Q(booking__id__icontains=booking_id) |
+        Q(booking__user__email__icontains=email) |
+        Q(booking__date__icontains=date) |
+        Q(food_option__name__icontains=search_value)
+    )
+    
     search_results = []
     for result in results:
         search_results.append({
-            'booking': result.booking.user,
+            'booking': result.booking.user.email,
             'booking_date': result.booking.date,
-            'food_option': result.food_option,
+            'food_option': result.food_option.name,
             'count': result.count,
             'served': result.served
         })
     return JsonResponse({'results': search_results})
+
 
 
 def create_review(request):
@@ -707,13 +708,11 @@ def offers_by_season(request):
 
 
 from django.http import HttpResponse
-from django.template.loader import get_template
 from django.conf import settings
-from io import BytesIO
 from .utils import TicketPDF
 @login_required
 def download_ticket(request):
-    booking = Book.objects.first()  # Get the first booking instance
+    booking = Book.objects.first()  
     adult_count = booking.count_adult
     child_count = booking.count_child
     Package_Adult = booking.p1_id

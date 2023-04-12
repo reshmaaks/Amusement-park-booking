@@ -17,11 +17,11 @@
         {% block content %}
         <center><img src="{% static 'images/check-circle.gif' %}">
         <h1>Payment Successful</h1>
-            <p>Thank you for your payment!</p>
+           
+            <h4></h4><a href="{% url 'download_ticket' %}">Download your tickets here!</a>
             <br>
             <br>
-            <h4>Download your tickets here!</h4><a href="{% url 'download_ticket' %}">Download Ticket</a>
-            
+            <p>Thank you for your payment!<a href="{% url 'index' %}"> Click Here </a> to return home</p>
         </form>
 
         </center> 

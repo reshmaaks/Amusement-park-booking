@@ -345,21 +345,10 @@ body {
             <label for="selling_price">Price</label>
             <input type="text" id="selling_price" onkeyup='priceValidation(this)' name="selling_price" required="required"/>
           </div>
-          <div class="form-group">
-            <label for="cat"></label>
-        
-            <select id="category" name="brand" class="dropdown1" required="required">
-                <option value="" selected disabled>Select category</option>
-                {% for i in obj %}
-                <option  value="{{ i.pk }}">{{ i.brandname }}</option>
-              {% endfor %}
-                
-              </select>
-            </div>
+          
            
           <div class="form-group">
-            <label for="cat"></label>
-        
+            <label for="cat">Select :</label>
             <select id="category" name="cat" class="dropdown2" required="required">
                 <option value="" selected disabled>Select category</option>
                 {% for item in items %}

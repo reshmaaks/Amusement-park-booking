@@ -223,18 +223,18 @@
 								<li class="nav-item">
 									<a href="{% url 'home' %}" class="nav-link">
 										<i class="nav-icon fas fa-th-large"></i>
-										<p>{% trans 'Booking Analysis' %}</p>
+										<p>{% trans 'Prediction' %}</p>
 									</a>
 								</li>
 								<li class="nav-item">
 									<a href="{% url 'offers_by_season' %}" class="nav-link">
 										<i class="nav-icon fas fa-th-large"></i>
-										<p>{% trans 'Prediction' %}</p>
+										<p>{% trans 'Booking Analysis' %}</p>
 									</a>
 								</li>
 								{% if jazzmin_settings.navigation_expanded %}
 									{% for app in side_menu_list %}
-										<li class="nav-header">{{ app.name }}</li>
+										<li class="nav-header">Dreamland Park</li>
 										
 										{% for model in app.models %}
 											<li class="nav-item">

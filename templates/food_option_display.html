@@ -51,40 +51,9 @@
 </div>
 
     <h1>Booking Food Options</h1>
-     
-<script>
-    $(document).ready(function() {
-  $('#search-input').on('input', function() {
-    var searchValue = $(this).val();
-    $.ajax({
-      url: '/search/',
-      data: {
-        'search_value': searchValue
-      },
-      dataType: 'json',
-      success: function(data) {
-        // Clear the table
-        $('#booking-table tbody').empty();
-        // Iterate through the search results and append them to the table
-        $.each(data.results, function(index, result) {
-          var row = $('<tr>');
-          row.append($('<td>').text(result.booking));
-          row.append($('<td>').text(result.booking_date));
-          row.append($('<td>').text(result.food_option));
-          row.append($('<td>').text(result.count));
-          row.append($('<td>').text(result.served ? 'Yes' : 'No'));
-          $('#booking-table tbody').append(row);
-        });
-      }
-    });
-  });
-});
-
-</script>
-
     <form method="GET" action="{% url 'booking_food_options' %}" class="filter-form">
         <div class="form-group">
-            <label for="served"></label>
+            <label for="served">Served:</label>
             <select id="served" name="served" class="form-control">
                 <option value="" selected disabled>Select</option>
                 <option value="">All</option>
@@ -97,11 +66,65 @@
         </div>
     </form>
     
+    
+    <table class="table">
+        <thead id="search-results-header" class="d-none">
+          <tr>
+            <th scope="col">Booking</th>
+            <th scope="col">Booked date</th>
+            <th scope="col">Food Option</th>
+            <th scope="col">Count</th>
+            <th scope="col">Served</th>
+          </tr>
+        </thead>
+        <tbody id="search-results"></tbody>
+      </table>
+      
+      <script>
+        $('#search-input').on('input', function() {
+          var searchValue = $(this).val();
+          $.ajax({
+            url: '/search/',
+            data: {
+              'search_value': searchValue,
+              'booking_id': searchValue,
+              'email': searchValue,
+              'date': searchValue
+            },
+            dataType: 'json',
+            success: function(data) {
+              // Clear the table
+              $('#search-results').empty();
+              // Iterate through the search results and append them to the table
+              $.each(data.results, function(index, result) {
+                var row = $('<tr>');
+                row.append($('<td>').text(result.booking));
+                row.append($('<td>').text(result.booking_date));
+                row.append($('<td>').text(result.food_option));
+                row.append($('<td>').text(result.count));
+                row.append($('<td>').text(result.served ? 'Yes' : 'No'));
+                $('#search-results').append(row);
+              });
+              // Show or hide the table header based on whether there are search results or not
+              if ($('#search-results tr').length > 0) {
+                $('#search-results-header').removeClass('d-none');
+              } else {
+                $('#search-results-header').addClass('d-none');
+              }
+            }
+          });
+        });
+      </script>
+    
+  
+
+    
 
 
     <table class="table">
         <thead>
             <tr>
+              <th scope="col">Booking ID</th>
                 <th scope="col">Booking</th>
                 <th scope="col">Booked date</th>
                 <th scope="col">Food Option</th>
@@ -112,6 +135,7 @@
         <tbody>
             {% for booking_food_option in booking_food_options %}
                 <tr>
+                  <td>{{ booking_food_option.booking_id }}</td>
                     <td>{{ booking_food_option.booking }}</td>
                     <td>{{ booking_food_option.booking.date }}</td>
                     <td>{{ booking_food_option.food_option }}</td>
