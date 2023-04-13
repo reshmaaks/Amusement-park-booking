@@ -558,26 +558,94 @@ def edit_item(request, pk):
         categories = foodCategory.objects.all()
         return render(request, 'edit_item.html', {'product': product, 'categories': categories})
 
+
 from django.utils import timezone
+from django.db.models import Q
+from django.http import JsonResponse
 def booked_food(request):
     today = timezone.now().date() # get today's date in timezone
     bookings_today = Book.objects.filter(date__exact=today, food=True) # filter only food bookings
+    query = None
+    if request.method == 'GET':
+        query = request.GET.get('q')
+        print(query)
+        if query:
+            bookings_today = bookings_today.filter(Q(user__email__icontains=query) | Q(id__icontains=query))
     context = {
-        'booked_today': bookings_today
+        'booked_today': bookings_today,
+        'query': query,
     }
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        html = render_to_string('booked_food_ajax.html', context)
+        data_dict = {'html_from_view': html}
+        return JsonResponse(data=data_dict)
     return render(request, 'booked_food.html', context)
+
+
+# def food_details(request, booking_id):
+#     if 'email' in request.session:
+#         booking = Book.objects.get(id=booking_id)
+#         food_options = BookingFoodOption.objects.filter(booking=booking)
+#         return render(request, 'food_details.html', {'food_options': food_options})
+#     else:
+#         return JsonResponse({'success': False})
+# #slip
+
+from django.shortcuts import render, reverse
+from django.http import HttpResponse, JsonResponse
+from reportlab.pdfgen import canvas
+from io import BytesIO
+
+def generate_pdf(request, booking_id):
+    # create a file-like buffer to receive PDF data
+    buffer = BytesIO()
+
+    # create the PDF object, using the buffer as its "file"
+    p = canvas.Canvas(buffer)
+
+    # write the PDF content here (e.g. food details)
+    booking = Book.objects.get(id=booking_id)
+    food_options = BookingFoodOption.objects.filter(booking=booking)
+    
+    p.drawString(100, 750, "Food Details:")
+    y = 700
+    for food_option in food_options:
+        name = food_option.food_option.name
+        category = food_option.food_option.cat.title
+        count = str(food_option.count)
+        status = "Served" if food_option.served else "Not Served"
+        p.drawString(100, y, name)
+        p.drawString(200, y, category)
+        p.drawString(300, y, count)
+        p.drawString(400, y, status)
+        y -= 20
+
+    # close the PDF object cleanly, and we're done
+    p.showPage()
+    p.save()
+
+    # get the value of the BytesIO buffer and write it to the response
+    pdf = buffer.getvalue()
+    buffer.close()
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="food_details_{booking_id}.pdf"'
+    response.write(pdf)
+    return response
 
 def food_details(request, booking_id):
     if 'email' in request.session:
         booking = Book.objects.get(id=booking_id)
         food_options = BookingFoodOption.objects.filter(booking=booking)
-        return render(request, 'food_details.html', {'food_options': food_options})
+        context = {'booking': booking, 'food_options': food_options}
+        pdf_url = reverse('generate_pdf', kwargs={'booking_id': booking_id})
+        context['pdf_url'] = pdf_url
+        return render(request, 'food_details.html', context)
     else:
         return JsonResponse({'success': False})
 
+
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
-
 def serve_food_option(request):
     if 'email' in request.session:
         booking_food_option_id = request.POST.get('booking_food_option_id')
@@ -597,6 +665,7 @@ def food_option_display(request):
         return render(request, 'food_option_display.html', {'booking_food_options': booking_food_options})
     
     return redirect('index')
+    
 #filtering
 from django.shortcuts import render
 from .models import BookingFoodOption
@@ -631,6 +700,7 @@ def search_booking_food_options(request):
     search_results = []
     for result in results:
         search_results.append({
+            'booking_id': result.booking_id,
             'booking': result.booking.user.email,
             'booking_date': result.booking.date,
             'food_option': result.food_option.name,

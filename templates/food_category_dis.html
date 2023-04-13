@@ -35,7 +35,6 @@
 						    <tr>
                   <th >Picture</th>
                   <th >Name</th>
-                  <!-- <th >Brand name</th> -->
                   <th >Edit</th>
                   <th >Delete</th> 
             
@@ -46,13 +45,9 @@
                 <tr>
                    <td><img src="/media/{{i.category_image}}"  alt="" /></td>
                    <td >{{i.title}}</td>
-                   <!-- <td>{{i.items.brandname}}</td> -->
-     
                    <td><a href="{% url 'edit_food_category' i.pk %}" ><i class="fa fa-pencil"></i></a></td>
                    <td><a href="{% url 'delete_food_category' i.pk %}" name="prod_id"><i class="fa fa-trash"></i></a></td>
-                   
                 </tr>
-                
           {% endfor %}
 						  </tbody>
 						</table>

@@ -1,50 +1,84 @@
 {% extends 'nav.html' %}
 
-
 {% block content %}
   <h1>Booked Food</h1>
+
+  <div class="search-container">
+    <form id="search-form">
+      <input type="text" id="search-input" name="q" placeholder="Search...">
+      <button type="submit">Search</button>
+    </form>
+  <br>
+    <form action="{% url 'booked_food'  %}">
+      <button type="submit">  All  </button>
+    </form>
+  </div>
+  <br>
+
   <table class="table">
     <thead>
       <tr>
-        <th>Mail ID</th>
+        <th>Booking ID</th>
+        <th>Email</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="search-results">
       {% for booking in booked_today %}
         <tr>
           <td>
-            <a href="{% url 'food_details' booking.id %}">{{ booking.user.email }}</a>
+            <a href="{% url 'food_details' booking.id %}">{{ booking.id }}</a>
+          </td>
+          <td>
+            {{ booking.user.email }}
           </td>
         </tr>
       {% empty %}
-        <tr>
-          <td colspan="2">No bookings for today.</td>
-        </tr>
+        {% if query %}
+          <tr>
+            <td colspan="2">No results found for "{{ query }}".</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="2">No bookings for today.</td>
+          </tr>
+        {% endif %}
       {% endfor %}
     </tbody>
   </table>
-
 {% endblock %}
 
 {% block scripts %}
   <script>
-    function servedFood(foodOptionId) {
-      $.ajax({
-        type: 'POST',
-        url: "{% url 'served_food' %}",
-        data: {
-          'food_option_id': foodOptionId,
-          'csrfmiddlewaretoken': '{{ csrf_token }}'
-        },
-        success: function(response) {
-          alert('Food served successfully!');
-        },
-        error: function(response) {
-          alert('Error serving food.');
+    $(document).ready(function() {
+      var searchInput = $('#search-input');
+      var searchResults = $('#search-results');
+      var searchUrl = "{% url 'booked_food' %}";
+    
+      // Handle search form submit event
+      $('#search-form').on('submit', function(e) {
+        e.preventDefault();
+        var query = searchInput.val();
+        searchResults.empty();
+        if (query.length > 0) {
+          $.ajax({
+            url: searchUrl,
+            data: {
+              'q': query
+            },
+            success: function(data) {
+              // Display search results or "No results found" message
+              if (data.trim().length > 0) {
+                searchResults.html(data);
+              } else {
+                searchResults.html("<tr><td colspan='2'>No results found for \"" + query + "\".</td></tr>");
+              }
+            },
+            error: function() {
+              console.log('Error making search request.');
+            }
+          });
         }
       });
-    }
+    });
   </script>
 {% endblock %}
-
-
