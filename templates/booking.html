@@ -228,6 +228,7 @@
 		<div class="col-md-8 offset-md-2 booking-form">
 			<h2>				Booking Form</h2>
 			<form   action="{% url 'booking' %}" method="POST" >
+				{% include 'alert.html' %}   
 				{% csrf_token %}
 				<div class="form-group">
 					<label for="date">Select Date:</label>
