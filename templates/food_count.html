@@ -1,0 +1,89 @@
+{% extends 'nav.html' %}
+{%  load static %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Food Count</title>
+    <style>
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        label, input {
+            margin-bottom: 10px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #3e8e41;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+	<br>
+	<br>
+	<br>
+	<br>
+	<h1>Food Count</h1>
+	<form method="POST">
+		{% csrf_token %}
+		<label for="selected_date">Select Date:</label>
+		<input type="date" id="selected_date" name="selected_date">
+		<input type="submit" value="Submit">
+	</form>
+	{% if food_options %}
+	<center><h3>Food Options for {{ date }}</h3></center>
+  <table>
+    <thead>
+      <tr>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Count</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      {% for option in food_options %}
+        <tr>
+
+          <td>{{ option.food_option__name }}</td>
+          <td>{{ option.food_option__cat__title }}</td>
+          <td>{{ option.count }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+ <center> <p>No food bookings found for this date.</p> </center>
+{% endif %}
+</body>
+</html>
+{% endblock %}

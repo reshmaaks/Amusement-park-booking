@@ -5,6 +5,7 @@
 <html lang="en">
 
 <head>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<!-- Required meta tags -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -22,6 +23,28 @@
 	<link rel="stylesheet" href="{% static 'vendors/animate-css/animate.css' %}">
 	<!-- main css -->
 	<link rel="stylesheet" href="{% static 'fcss/style.css' %}">
+	<style>
+		.chart-container {
+				background-color: #fff;
+				border-radius: 10px;
+				width: 500px;
+				height: 550px;
+				margin-left: 100px;
+				padding: 20px;
+				
+				text-align: center;
+			}
+
+			.sale-details-container {
+				background-color: #fff;
+				border-radius: 10px;
+				width: 500px;
+				margin-left: 500px;
+				padding: 250px;
+				text-align: center;
+			}
+
+	  </style>
 </head>
 
 <body>
@@ -34,47 +57,85 @@
 	</div>
 	
 	<!--================ End Header Menu Area =================-->
+	
+<!--================ Start Home Banner Area =================-->
+<section class="home_banner_area">
+	<br>
+	<br>
+	<br>
+	<br>
 
-		<!--================ Start Home Banner Area =================-->
-		<section class="home_banner_area">
-			<div class="banner_inner">
-				<div class="container-fluid no-padding">
-					<div class="row fullscreen">
+	<div class="banner_inner">
+		<div class="container-fluid no-padding">
+			<div class="row fullscreen">
+				<div class="col-lg-3 col-md-6 col-sm-12">
+					<div class="chart-container">
+						Sales Chart
+						<canvas id="sales-chart"></canvas>
 
+						<script>
+							// Data for the pie chart
+							const data = {
+								labels: {{ chart_data.labels|safe }},
+								datasets: [{
+									data: {{ chart_data.data|safe }},
+									backgroundColor: {{ chart_data.colors|safe }}
+								}]
+							};
+
+							// Configuration options for the pie chart
+							const options = {
+								responsive: true,
+								maintainAspectRatio: false,
+								legend: {
+									position: 'right',
+									labels: {
+										fontSize: 14,
+										fontColor: '#333'
+									}
+								},
+								tooltips: {
+									callbacks: {
+										label: function(tooltipItem, data) {
+											let label = data.labels[tooltipItem.index];
+											let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+											return label + ': ' + value + '%';
+										}
+									}
+								}
+							};
+
+							// Create the pie chart using Chart.js
+							const ctx = document.getElementById('sales-chart').getContext('2d');
+							const chart = new Chart(ctx, {
+								type: 'pie',
+								data: data,
+								options: options
+							});
+						</script>
+					</div>
+				</div>
+				<div class="col-lg-9 col-md-6 col-sm-12">
+					<div class="sale-details-container">
+						<!-- Include your sale details code here -->
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
+	</div>
+</section>
+
+	
+		  
+
 		<!-- Start banner bottom -->
 		<div class="row banner-bottom align-items-center justify-content-center">
 			<div class="col-lg-4">
 				<div class="video-popup d-flex align-items-center">
-					<!-- <a class="play-video video-play-button animate" href="https://www.youtube.com/watch?v=KUln2DXU5VE" data-animate="zoomIn" -->
-					 <!-- data-duration="1.5s" data-delay="0.1s"> -->
 						<span><img src="{% static 'images/img/banner/play-icon.png' %}" alt=""></span>
 					</a>
-					<!-- <div class="watch">
-						<h6>Watch video</h6>
-						<p>You will love our execution</p>
-					</div> -->
 				</div>
-				
 			</div>
-
-			<!-- <div class="col-lg-8">
-				<div class="banner_content">
-					<div class="row d-flex align-items-center">
-						<div class="col-lg-8 col-md-12">
-							<p class="top-text">Steak Shop offers best steak in town</p>
-							<h1>Steak Shop offers best steak in town</h1>
-							<p>inappropriate behavior is often laughed off as “boys will be boys,” women face higher conduct standards
-								especially in the workplace. That’s why it’s crucial that, as women.</p>
-						</div>
-						<div class="col-lg-4 col-md-12">
-							<div class="banner-btn">
-								<a class="primary-btn text-uppercase" href="#">Explore Menu</a>
-							</div>
-						</div>-->
 					</div> 
 				</div>
 			</div>

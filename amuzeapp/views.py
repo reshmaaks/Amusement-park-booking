@@ -63,11 +63,7 @@ def showitem(request, iid):
 def about(request):
     return render(request,'about.html')
 
-def dashboard(request):
-    if 'email' in request.session:
-        email=request.session['email']
-        return render(request,'dashboard.html',{'name':email})
-    return redirect (foodlogin)    
+
 
 def contact(request):
     return render(request,'contact.html')
@@ -582,14 +578,6 @@ def booked_food(request):
     return render(request, 'booked_food.html', context)
 
 
-# def food_details(request, booking_id):
-#     if 'email' in request.session:
-#         booking = Book.objects.get(id=booking_id)
-#         food_options = BookingFoodOption.objects.filter(booking=booking)
-#         return render(request, 'food_details.html', {'food_options': food_options})
-#     else:
-#         return JsonResponse({'success': False})
-# #slip
 
 from django.shortcuts import render, reverse
 from django.http import HttpResponse, JsonResponse
@@ -665,7 +653,70 @@ def food_option_display(request):
         return render(request, 'food_option_display.html', {'booking_food_options': booking_food_options})
     
     return redirect('index')
+
+
+from django.shortcuts import render
+from django.db.models import Sum
+from .models import BookingFoodOption
+def food_count(request):
+    if request.method == 'POST':
+        date = request.POST['selected_date']
+        food_bookings = Book.objects.filter(date=date, food=True)
+        food_options = BookingFoodOption.objects.filter(booking__in=food_bookings).values('food_option__name', 'food_option__cat__title').annotate(count=Sum('count'))
+        context = {
+            'date': date,
+            'food_options': food_options
+        }
+        return render(request, 'food_count.html', context)
+    return render(request, 'food_count.html')
+
+#foodchart
+from django.db.models import Sum
+from .models import BookingFoodOption
+
+import random
+
+def sales_chart(request):
+    sales_data = BookingFoodOption.objects.values('food_option__name').annotate(total_sales=Sum('count'))
+    labels = []
+    data = []
+    colors = []
+    for item in sales_data:
+        labels.append(item['food_option__name'])
+        data.append(item['total_sales'])
+        colors.append('#%06X' % random.randint(0, 0xFFFFFF))
+    context = {
+        'labels': labels,
+        'data': data,
+        'colors': colors,
+    }
+    return render(request, 'dashboard.html', context)
+
     
+
+def dashboard(request):
+    if 'email' in request.session:
+        email=request.session['email']
+        # get sales data for chart
+        sales_data = BookingFoodOption.objects.values('food_option__name').annotate(total_sales=Sum('count'))
+        labels = []
+        data = []
+        colors = []
+        for item in sales_data:
+            labels.append(item['food_option__name'])
+            data.append(item['total_sales'])
+            colors.append('#%06X' % random.randint(0, 0xFFFFFF))
+        chart_data = {
+            'labels': labels,
+            'data': data,
+            'colors': colors,
+        }
+        # render dashboard template with chart data
+        return render(request,'dashboard.html', {'chart_data': chart_data})
+
+
+
+
 #filtering
 from django.shortcuts import render
 from .models import BookingFoodOption
@@ -809,33 +860,4 @@ def download_ticket(request):
     response['Content-Disposition'] = f'attachment; ticket.pdf'
 
     return response
-
-
-# import os
-# import sys
-
-# sys.path.append(os.path.abspath(r"c:\users\lenovo\amusementpark\env\lib\site-packages"))
-
-# from django.template.loader import get_template
-# from xhtml2pdf import pisa
-
-
-# def pdf_report_create(request):
-#     # products = Product.objects.all()
-#     template_path = 'ticket.html'
-#     context = {}
-#     response = HttpResponse(content_type='application/pdf')
-#     response['Content-Disposition'] = 'filename="products_report.pdf"'
-#     template = get_template(template_path)
-#     html = template.render(context)
-#     pisa_status = pisa.CreatePDF(
-#        html, dest=response)
-#     if pisa_status.err:
-#        return HttpResponse('We had some errors <pre>' + html + '</pre>')
-#     return response
-
-
-# def ticket(request):
-#     return render(request,ticket.html)
-
 

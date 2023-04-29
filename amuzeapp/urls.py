@@ -41,6 +41,7 @@ urlpatterns = [
     path('item_add/',views.item_add,name='item_add'),
     # path('food_dis/', views.food_dis, name='food_dis'),
     # path('Delete/<int:id>/',views.Delete,name='Delete'),
+    path('food-count/', views.food_count, name='food-count'),
     path('generate-pdf/<int:booking_id>/', views.generate_pdf, name='generate_pdf'),
     path('add_food_category/', views.add_food_category, name='add_food_category'),
     path('food_category_dis/', views.food_category_dis, name='food_category_dis'),
@@ -61,6 +62,7 @@ urlpatterns = [
     path('booking_food_options', views.booking_food_options, name='booking_food_options'),
     path('search/', search_booking_food_options, name='search_booking_food_options'),
     path('create_review/', create_review, name='create_review'),
+    path('sales-chart/', views.sales_chart, name='sales-chart'),
 
 
 
