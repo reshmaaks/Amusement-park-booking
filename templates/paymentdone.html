@@ -1,33 +1,41 @@
-
-
 {% load static %}
 <html>
     <head>
         <style>
             img {
-        border-radius: 50%;
-        height: 250px;
-        width: 250px;
-        }
+                border-radius: 50%;
+                height: 250px;
+                width: 250px;
+            }
 
+            .download-btn {
+                background-color: #4CAF50;
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin-top: 20px;
+                cursor: pointer;
+            }
         </style>
-        </head>
+    </head>
     <body>
-    <form method="POST">
-        {% block content %}
-        <center><img src="{% static 'images/check-circle.gif' %}">
-        <h1>Payment Successful</h1>
-           
+        <form method="POST">
+            {% block content %}
+            <center><img src="{% static 'images/check-circle.gif' %}">
+            <h1>Payment Successful</h1>
+            <h4></h4>
+            <br>
+            <br>
+            <p>Thank you for your payment! <a href="{% url 'index' %}">Click Here</a> to return home</p>
+            
             <h4></h4><a href="{% url 'download_ticket' %}">Download your tickets here!</a>
-            <br>
-            <br>
-            <p>Thank you for your payment!<a href="{% url 'index' %}"> Click Here </a> to return home</p>
+            
+            </center>
+            {% endblock %}
         </form>
-
-        </center> 
-
-
-
-        {% endblock %}
     </body>
 </html>

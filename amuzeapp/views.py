@@ -336,7 +336,6 @@ def delete_food_category(request,id):
 
 import razorpay
 from datetime import datetime
-
 @login_required
 def booking(request):
     if request.method == 'POST':
@@ -354,7 +353,7 @@ def booking(request):
             season = 'Summer'
         else:
             season = 'Fall'
-        print(season)    
+        print(season)
         count_adult = int(request.POST.get('count1', 1))
         count_child = int(request.POST.get('count2', 0))
         try:
@@ -369,16 +368,15 @@ def booking(request):
             messages.error(request, 'Invalid package selected.')
             return redirect('booking')
         booking_limit = BookingLimit.objects.filter(date=date).first()
-        if not booking_limit:
-            booking_limit = BookingLimit.objects.create(date=date)
-        max_bookings = booking_limit.max_bookings
-        num_bookings_today = Placed_Booking.objects.filter(date=date).count()
-        if num_bookings_today >= max_bookings:
+        if booking_limit and booking_limit.max_bookings <= Book.objects.filter(date=date).count():
             messages.error(request, 'Maximum number of bookings reached for today.')
-            return redirect('booking')    
-        food_options = Product.objects.all()   
+            return redirect('booking')
+        elif not booking_limit:
+            messages.error(request, 'Booking not available.')
+            return redirect('booking')
+        food_options = Product.objects.all()
         total_price = (count_adult * p1.price) + (count_child * p2.price)
-        booking = Book.objects.create(user=user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child, total_price=total_price,season=season)
+        booking = Book.objects.create(user=user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child, total_price=total_price, season=season)
         # ordered_booking = Placed_Booking.objects.create(user=booking.user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child)
         # ordered_booking.save()
         food_selected = False
@@ -390,18 +388,86 @@ def booking(request):
                 print(3)
                 BookingFoodOption.objects.create(booking=booking, food_option=food, count=count)
                 food_selected = True
-                print(user,booking, food, count)
+                total_price += count * food.selling_price
+                print(user, booking, food, count)
+        booking.total_price = total_price  # update total price to include food cost
+        booking.save()
         if food_selected:
             booking.food = True
-            booking.save()        
-        messages.success(request, 'Booking successful.')
+            booking.save()
+        # messages.success(request, 'Booking successful.')
         return redirect('checkout', booking.id)
     adult_packages = Adultpackage.objects.all()
     child_packages = Childpackage.objects.all()
     food_options = Product.objects.all()
-    return render(request, 'booking.html', {'adult_packages': adult_packages, 'child_packages': child_packages,'food_options': food_options})
+    return render(request, 'booking.html', {'adult_packages': adult_packages, 'child_packages': child_packages, 'food_options': food_options})
+
+# def booking(request):
+#     if request.method == 'POST':
+#         user = request.user
+#         p1_id = request.POST.get('p1_id')
+#         p2_id = request.POST.get('p2_id')
+#         date = request.POST.get('date')
+#         booking_date = datetime.strptime(date, '%Y-%m-%d')
+#         month = booking_date.month
+#         if month in [12, 1, 2]:
+#             season = 'Winter'
+#         elif month in [3, 4, 5]:
+#             season = 'Spring'
+#         elif month in [6, 7, 8]:
+#             season = 'Summer'
+#         else:
+#             season = 'Fall'
+#         print(season)    
+#         count_adult = int(request.POST.get('count1', 1))
+#         count_child = int(request.POST.get('count2', 0))
+#         try:
+#             p1 = Adultpackage.objects.get(p1_id=p1_id)
+#         except Adultpackage.DoesNotExist:
+#             p1 = None
+#         try:
+#             p2 = Childpackage.objects.get(p2_id=p2_id)
+#         except Childpackage.DoesNotExist:
+#             p2 = None
+#         if p1 is None:
+#             messages.error(request, 'Invalid package selected.')
+#             return redirect('booking')
+#         booking_limit = BookingLimit.objects.filter(date=date).first()
+#         if not booking_limit:
+#             booking_limit = BookingLimit.objects.create(date=date)
+#         max_bookings = booking_limit.max_bookings
+#         num_bookings_today = Placed_Booking.objects.filter(date=date).count()
+#         if num_bookings_today >= max_bookings:
+#             messages.error(request, 'Maximum number of bookings reached for today.')
+#             return redirect('booking')    
+#         food_options = Product.objects.all()   
+#         total_price = (count_adult * p1.price) + (count_child * p2.price)
+#         booking = Book.objects.create(user=user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child, total_price=total_price,season=season)
+#         # ordered_booking = Placed_Booking.objects.create(user=booking.user, p1_id=p1, p2_id=p2, date=date, count_adult=count_adult, count_child=count_child)
+#         # ordered_booking.save()
+#         food_selected = False
+#         for food in Product.objects.all():
+#             print(1)
+#             count = int(request.POST.get(f'food_count_{food.id}', 0))
+#             print(count)
+#             if count > 0:
+#                 print(3)
+#                 BookingFoodOption.objects.create(booking=booking, food_option=food, count=count)
+#                 food_selected = True
+#                 total_price += count * food.selling_price
+#                 print(user,booking, food, count)
+#         if food_selected:
+#             booking.food = True
+#             booking.save()        
+#         messages.success(request, 'Booking successful.')
+#         return redirect('checkout', booking.id)
+#     adult_packages = Adultpackage.objects.all()
+#     child_packages = Childpackage.objects.all()
+#     food_options = Product.objects.all()
+#     return render(request, 'booking.html', {'adult_packages': adult_packages, 'child_packages': child_packages,'food_options': food_options})
 
 from django.db.models import Q
+@login_required 
 @login_required 
 def checkout(request, booking_id):
     latest_booking = Book.objects.get(id=booking_id)
@@ -409,6 +475,8 @@ def checkout(request, booking_id):
     booking_food_options = latest_booking.bookingfoodoption_set.all()
     applied_offers_count = 0
     eligible_offers = []
+    discount = 0
+    
     for offer in active_offers:
         if offer.count_adult is not None and latest_booking.count_adult >= offer.count_adult:
             adult_offers = active_offers.filter(count_adult__lte=latest_booking.count_adult)
@@ -424,11 +492,11 @@ def checkout(request, booking_id):
                     applied_offers_count += 1
 
     for offer in eligible_offers:
-        discount = (latest_booking.total_price * offer.discount_percentage) / 100
-        latest_booking.total_price -= discount
+        discount += (latest_booking.total_price * offer.discount_percentage) / 100
 
     latest_booking.applied_offers = applied_offers_count
-    latest_booking.total_price = int(latest_booking.total_price)
+    latest_booking.discount_amount = discount
+    latest_booking.total_price = int(latest_booking.total_price - discount)
 
     if 'discount_applied' not in request.session:
         request.session['discount_applied'] = True
@@ -456,8 +524,6 @@ def checkout(request, booking_id):
         )
         latest_booking.payment = payment
         latest_booking.save()
-        # return render(request,'success.html')
-
     context = {
         'booking_food_options': booking_food_options,
         'latest_booking': latest_booking,
@@ -466,6 +532,74 @@ def checkout(request, booking_id):
     }
 
     return render(request, 'checkout.html', context)
+
+
+
+
+
+# def checkout(request, booking_id):
+#     latest_booking = Book.objects.get(id=booking_id)
+#     active_offers = Offer.objects.filter(active=True)
+#     booking_food_options = latest_booking.bookingfoodoption_set.all()
+#     applied_offers_count = 0
+#     eligible_offers = []
+#     for offer in active_offers:
+#         if offer.count_adult is not None and latest_booking.count_adult >= offer.count_adult:
+#             adult_offers = active_offers.filter(count_adult__lte=latest_booking.count_adult)
+#             for adult_offer in adult_offers:
+#                 if adult_offer not in eligible_offers:
+#                     eligible_offers.append(adult_offer)
+#                     applied_offers_count += 1
+#         if offer.count_child is not None and latest_booking.count_child >= offer.count_child:
+#             child_offers = active_offers.filter(count_child__lte=latest_booking.count_child)
+#             for child_offer in child_offers:
+#                 if child_offer not in eligible_offers:
+#                     eligible_offers.append(child_offer)
+#                     applied_offers_count += 1
+
+#     for offer in eligible_offers:
+#         discount = (latest_booking.total_price * offer.discount_percentage) / 100
+#         latest_booking.total_price -= discount
+
+#     latest_booking.applied_offers = applied_offers_count
+#     latest_booking.total_price = int(latest_booking.total_price)
+
+#     if 'discount_applied' not in request.session:
+#         request.session['discount_applied'] = True
+
+#     client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET_KEY))
+#     data = {
+#         'amount': latest_booking.total_price * 100,  
+#         'currency': 'INR',
+#         'receipt': str(latest_booking.id),
+#         'payment_capture': 1,
+#     }
+#     order = client.order.create(data=data)
+#     order_id = order['id']
+#     print(order_id)
+#     request.session['order_id'] = order_id
+#     print(order_id)
+#     request.session['booking_id'] = booking_id
+#     order_status = order['status']
+#     if order_status == 'created':
+#         payment = Payments.objects.create(
+#             user=latest_booking.user,
+#             amount=latest_booking.total_price,
+#             razorpay_order_id=order_id,
+#             razorpay_payment_status=order_status,
+#         )
+#         latest_booking.payment = payment
+#         latest_booking.save()
+#         # return render(request,'success.html')
+
+#     context = {
+#         'booking_food_options': booking_food_options,
+#         'latest_booking': latest_booking,
+#         'eligible_offers': eligible_offers,
+#         'order_id': order_id
+#     }
+
+#     return render(request, 'checkout.html', context)
 
 @login_required
 def paymentdone(request):
@@ -495,6 +629,53 @@ def paymentdone(request):
             ordered_booking.save()
             return render(request,'paymentdone.html')
         return redirect(booking)
+
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from django.conf import settings
+from .utils import TicketPDF
+
+from django.contrib.auth.decorators import login_required
+@login_required
+def download_ticket(request):
+    user = request.user
+    booking = Book.objects.filter(user=request.user).latest('created_at')
+    adult_count = booking.count_adult
+    child_count = booking.count_child
+    Package_Adult = booking.p1_id
+    Package_Child = booking.p2_id
+
+    # ticket_type = 'Adult' if booking.p1_id == 'A' else 'Child'
+    date = booking.date
+    total_price = booking.total_price
+
+    ticket_details = {
+        'Package_Adult': Package_Adult,
+        'Package_Child': Package_Child,
+        'date': date,
+        'total_price': total_price,
+        'adult_count': adult_count,
+        'child_count': child_count,
+    }
+    
+    # Get the food options for the current booking
+    food_options = BookingFoodOption.objects.filter(booking=booking)
+
+    ticket_pdf = TicketPDF(adult_count=adult_count, child_count=child_count)
+    ticket_pdf.set_ticket_details(ticket_details)
+    
+    # Add the food options to the PDF
+    ticket_pdf.set_food_options(food_options)
+    
+    ticket_data = ticket_pdf.get_pdf_bytes()
+
+    response = HttpResponse(ticket_data, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; ticket.pdf'
+
+    return response
+
+
+
 
 def item_add(request):
     if 'email' in request.session:
@@ -585,18 +766,18 @@ from reportlab.pdfgen import canvas
 from io import BytesIO
 
 def generate_pdf(request, booking_id):
-    # create a file-like buffer to receive PDF data
     buffer = BytesIO()
-
-    # create the PDF object, using the buffer as its "file"
     p = canvas.Canvas(buffer)
-
-    # write the PDF content here (e.g. food details)
     booking = Book.objects.get(id=booking_id)
-    food_options = BookingFoodOption.objects.filter(booking=booking)
-    
-    p.drawString(100, 750, "Food Details:")
-    y = 700
+    food_options = BookingFoodOption.objects.filter(booking=booking) 
+    logo_path = r'C:\Users\lenovo\amusementpark\AmusementPark\static\images\logo2.jpg'
+    p.drawImage(logo_path, 50, 750, width=100, height=100)
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(200, 780, "DreamlandPark")    
+    p.setFont("Helvetica", 12)
+    p.rect(90, 500, 400, 200)
+    p.drawString(200, 720, "Food Details:")
+    y = 680
     for food_option in food_options:
         name = food_option.food_option.name
         category = food_option.food_option.cat.title
@@ -607,12 +788,8 @@ def generate_pdf(request, booking_id):
         p.drawString(300, y, count)
         p.drawString(400, y, status)
         y -= 20
-
-    # close the PDF object cleanly, and we're done
     p.showPage()
     p.save()
-
-    # get the value of the BytesIO buffer and write it to the response
     pdf = buffer.getvalue()
     buffer.close()
     response = HttpResponse(content_type='application/pdf')
@@ -826,38 +1003,4 @@ def offers_by_season(request):
     values = offers_sum_df.values.tolist()
     chart_data = {'labels': labels, 'values': values}
     return render(request, 'chart.html', {'chart_data': chart_data})
-
-
-from django.http import HttpResponse
-from django.conf import settings
-from .utils import TicketPDF
-@login_required
-def download_ticket(request):
-    booking = Book.objects.first()  
-    adult_count = booking.count_adult
-    child_count = booking.count_child
-    Package_Adult = booking.p1_id
-    Package_Child = booking.p2_id
-
-    # ticket_type = 'Adult' if booking.p1_id == 'A' else 'Child'
-    date = booking.date
-    total_price = booking.total_price
-
-    ticket_details = {
-        'Package_Adult': Package_Adult,
-        'Package_Child': Package_Child,
-        'date': date,
-        'total_price': total_price,
-        'adult_count': adult_count,
-        'child_count': child_count,
-    }
-    
-    ticket_pdf = TicketPDF(adult_count=adult_count, child_count=child_count)
-    ticket_pdf.set_ticket_details(ticket_details)
-    ticket_data = ticket_pdf.get_pdf_bytes()
-
-    response = HttpResponse(ticket_data, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; ticket.pdf'
-
-    return response
 

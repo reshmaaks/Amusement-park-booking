@@ -244,9 +244,21 @@ class Offer(models.Model):
     def __str__(self):
         return self.name        
 
+from django.utils import timezone
 class BookingLimit(models.Model):
     max_bookings = models.PositiveIntegerField(default=True)
     date = models.DateField(unique=True,null=True)
+    def clean(self):
+        # Check if date is in the past
+        if self.date and self.date < timezone.now().date():
+            raise ValidationError('Booking date cannot be in the past.')
+        
+        # Check if date is before tomorrow
+        if self.date and self.date < timezone.now().date() + timezone.timedelta(days=1):
+            raise ValidationError('Booking date must be tomorrow or later.')
+
+    class Meta:
+        unique_together = ['date']
 
 from django.utils.html import format_html
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
