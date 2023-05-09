@@ -38,7 +38,9 @@
 			margin-top: 100px;
 			margin-bottom: 100px;
 		}
-
+		.booked {
+			background-color: blue;
+		}
 		.booking-form h2 {
 			font-size: 24px;
 			font-weight: 700;
@@ -232,9 +234,33 @@
 				{% csrf_token %}
 				<div class="form-group">
 					<label for="date">Select Date:</label>
-					<input type="date" class="form-control"  name="date" required>
-                    <small id="date-error" class="text-danger d-none">Please select a date in the future.</small>
+					<input type="date" class="form-control date" id="date" name="date" required>
+					<script>
+						var dates = document.querySelectorAll('.date');
+						for (var i = 0; i < dates.length; i++) {
+							var date = dates[i];
+							date.addEventListener('change', function() {
+								var selectedDate = this.value;
+								var xhr = new XMLHttpRequest();
+								xhr.open('GET', '/get_booking_limit?date=' + selectedDate);
+								xhr.onload = function() {
+									if (xhr.status === 200) {
+										var bookingLimit = JSON.parse(xhr.responseText)['booking_limit'];
+										if (bookingLimit <= 0) {
+											date.classList.add('booked');
+										} else {
+											date.classList.remove('booked');
+										}
+									}
+								};
+								xhr.send();
+							});
+						}
+					</script>
+					
+					<small id="date-error" class="text-danger d-none">Please select a date in the future.</small>
 				</div>
+				
                 <div class="form-group">
                     <label for="adult-package">Select Adult Package:</label>
                     <select class="form-control" id="adult-package" name="p1_id">

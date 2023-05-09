@@ -1,0 +1,171 @@
+
+{% load static %}
+
+
+
+<head class="ttr-header">
+
+<link rel="stylesheet" href="{% static 'reg/fonts/material-icon/css/material-design-iconic-font.min.css' %}">
+<!-- Main css -->
+<link rel="stylesheet" href="{% static 'reg/css/style.css' %}">
+
+    <!-- Custom Css -->
+    <link rel="stylesheet" href="{% static 'profile/profile.css' %}">
+
+    <!-- FontAwesome 5 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">
+</head>
+<body style= "background-image: url('../static/images/amuse3.jpg');">
+
+{% block body %}
+<div class="navbar-top" style="margin-top: -120px;">
+	<div class="title">
+		<h1>Dreamland Park</h1>
+	</div>
+
+	<!-- Navbar -->
+	<ul>
+		<li>
+			<a href="{% url 'index' %} "class="nav-link">Home</a>
+				
+		</li>
+		<li class="nav-item"><a href='#about' class="nav-link">About</a></li>
+		  <li class="nav-item"><a href='#ride' class="nav-link">Rides</a></li>
+		  
+		  <li class="nav-item"><a href="#" class="nav-link">Contact</a></li>
+		  
+		  <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link">Logout</a></li>
+		  
+		<li>
+			<a href="{% url 'profile' %} ">
+				<i class="fa fa-sign-out-alt fa-2x"></i>
+			</a>
+		</li>
+	</ul>
+	<!-- End -->
+</div>
+<!-- End -->
+
+    <!-- Sidenav -->
+    <div class="sidenav">
+        <div class="profile">
+            <img src="https://th.bing.com/th/id/OIP.3xgd-aQ4EDx5dx52FWvF3QHaH_?pid=ImgDet&w=1000&h=1080&rs=1" alt="" width="100" height="100">
+
+            <div class="name">
+            {{user.username }}
+            </div>
+        </div>
+
+        <div class="sidenav-url">
+            <div class="url">
+                <a href="{% url 'profile' %} " class="active">Profile</a>
+                <hr align="center">
+            </div>
+            <div class="url">
+                <a href="{% url 'booknow' %}">Book Now</a>
+                <hr align="center">
+            </div>
+            <div class="url">
+                <a href="{% url 'review' %}">Reviews</a>
+                <hr align="center">
+            </div>
+            <div class="url">
+                <a href="{% url 'service' %}">My Bookings</a>
+                <hr align="center">
+            </div>
+        </div>
+    </div>
+    <!-- End -->
+<div class="container" >
+<div class="db-breadcrumb"></div>
+	<div class="row">
+		<div class="center">
+			<div class="main">
+				<section class="sign-in">
+					<div class="container">
+						<div class="signin-content">
+							<div class="col-lg-12 m-b30">
+								<div class="widget-box">
+									<div class="wc-title">
+										<h4 style="font-size:20px;margin-left:2px;text-align:center; color: rgb(11, 51, 85);">Your Reviews</h4>
+									</div>
+									<div class="email-wrapper">
+				<!-- Your Profile Views Chart -->
+<div class="col-lg-12 m-b30" style="background-image:url(static/images/a.jpeg)">
+	<div class="widget-box">
+		<div class="email-wrapper">
+
+		<div class="mail-list-container">
+		<!-- {% for message in messages %}
+         <h3 style="font-size:20px;margin-left:2px;color:red;text-align:center;" class="text-danger font-weight-bold">{{message}}</h3>
+           {% endfor %} -->
+			<form method="POST" action="{% url 'review' %}"class="mail-compose">
+				{% include 'alert.html' %}
+				{% csrf_token %}    
+			
+			 
+			<div class="row">
+			<div class="col-md-3">
+			
+			
+			
+										
+									</div>
+									<div class="form-group col-10">
+										<div class="form-group">
+											<input type="text" class="form-input" name="title"  placeholder="Title"   required/>
+										<br>
+										</div>
+<!--										<input class="summernote" rows="10" cols="83"type="text" placeholder="Type here">-->
+										<textarea id="story" class="form-input" name="review" rows="10" cols="53" placeholder="Type here" required></textarea>
+									</div>
+<!--									<div class="form-group col-12">-->
+<!--										<div class="summernote"><p>Hello World</p></div>-->
+<!--									</div>-->
+<!--									<div class="form-group col-12">-->
+<!--										<input type="file" accept=".xlsx,.xls,image/*,.doc,audio/*,.docx,video/*,.ppt,.pptx,.txt,.pdf" multiple>-->
+<!--									</div>-->
+<div class="form-group">
+	<input type="submit" name="submit" id="submit" class="form-submit" value="Submit"/>
+</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Your Profile Views Chart END-->
+			</div>
+</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</div>
+				</div>
+			</div>
+</div>
+</div>
+
+
+{% endblock body %}
+
+
+<!--	</main>-->
+<!--	<div class="ttr-overlay"></div>-->
+	<!-- header end -->
+
+<!-- External JavaScripts -->
+
+<script>
+    $(document).ready(function() {
+      $('.summernote').summernote({
+        height: 300,
+        tabsize: 2
+      });
+	  
+	   $('input[type="file"]').imageuploadify();
+    });
+</script>
+</body>
+
+<!-- Mirrored from educhamp.themetrades.com/demo/admin/mailbox-compose.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 22 Feb 2019 13:11:45 GMT -->

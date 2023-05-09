@@ -41,6 +41,7 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
     
+   
 class Account(AbstractBaseUser,PermissionsMixin):
     # role_choices    =(('is_admin','is_admin'),('is_superadmin','is_superadmin'),('None','None'))
     id              = models.AutoField(primary_key=True)
@@ -52,6 +53,7 @@ class Account(AbstractBaseUser,PermissionsMixin):
     is_staff        = models.BooleanField(default=False)
     is_admin        =models.BooleanField(default=False)
     is_active        =models.BooleanField(default=False)
+    # is_superuser   = models.BooleanField(default=False)
     # is_superuser   = models.BooleanField(default=False)
     objects = MyAccountManager()
     USERNAME_FIELD = 'email'

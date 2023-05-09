@@ -63,9 +63,13 @@ urlpatterns = [
     path('search/', search_booking_food_options, name='search_booking_food_options'),
     path('create_review/', create_review, name='create_review'),
     path('sales-chart/', views.sales_chart, name='sales-chart'),
-
-
-
+    path('get_booking_limit/', get_booking_limit, name='get_booking_limit'),
+    path('profile/',views.profile,name='profile'),
+    path('update_account/', update_account, name='update_account'),
+    path('resetpassword_validate/<uidb64>/<token>/', views.resetpassword_validate, name='resetpassword_validate'),
+    path('forgotPassword/', views.forgotPassword, name='forgotPassword'),
+    path('resetPassword/', views.resetPassword, name='resetPassword'),
+    path('activate/<uidb64>/<token>/', views.activate, name='activate'),
 
 ]
 
