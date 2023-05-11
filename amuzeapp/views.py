@@ -636,6 +636,12 @@ def checkout(request, booking_id):
 
     return render(request, 'checkout.html', context)
 
+def user_bookings(request):
+    bookings = Placed_Booking.objects.filter(user=request.user, paid=True)
+    context = {'bookings': bookings}
+    return render(request, 'user_bookings.html', context)
+
+
 
 
 

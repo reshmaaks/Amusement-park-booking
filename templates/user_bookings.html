@@ -31,7 +31,7 @@ body {
 }
 
 .muck-up {
-  width: 710px;
+  width: 1200px;
   height: 600px;
   margin: 5em auto;
   position: relative;
@@ -301,7 +301,7 @@ ul li.hang img {
   margin-right: 8px;
 }
 </style>
-<div class="muck-up">
+<div class="muck-up" style="height: 800px; overflow: auto;">
     <div class="overlay"></div>
     <div class="top">
       <div class="nav">
@@ -371,273 +371,33 @@ ul li.hang img {
       </style>
       
       <table>
-        <h2 style="color: blue;"><center>My Profile</center></h2>
+        <h2 style="color: blue;"><center>My Bookings</center></h2>
         <br>
-       
-
-
         <tr>
-          <th>Username</th>
-          <td>{{ user.username }}</td>
+          <th>Booking ID</th>
+          <th>Date</th>
+          <th>Adult Package </th>
+          <th>Child Package </th>
+          <th>Adults Count</th>
+          <th>Child Count</th>
+          <th>Food Included</th>
+          <th>Total Price</th>
+          <th>Status</th>
         </tr>
+        {% for booking in bookings %}
         <tr>
-          <th>Email</th>
-          <td>{{ user.email }}</td>
+          <td>{{ booking.id }}</td>
+          <td>{{ booking.date }}</td>
+          <td>{{ booking.p1_id.name }}</td>
+          <td>{{ booking.p2_id.name }}</td>
+          <td>{{ booking.count_adult }}</td>
+          <td>{{ booking.count_child }}</td>
+          <td>{% if booking.food %}Yes{% else %}No{% endif %}</td>
+          <td>{{ booking.total_price }}</td>
+          <td>{% if booking.paid %}Paid{% else %}Not Paid{% endif %}</td>
         </tr>
-        <tr>
-          <th>Phone</th>
-          <td>{{ user.phone }}</td>
-        </tr>
-        
+        {% endfor %}
       </table>
-      <div class="edit-button">
-        <style>
-            .edit-button {
-       position: fixed;
-       
-       background-color: #3695f4;
-       color: white;
-       padding: 10px;
-       border-radius: 50%;
-       box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.3);
-       z-index: 999;
-       transition: all 0.2s ease-in-out;
-     }
-     
-     .edit-button:hover {
-       background-color: #524aea;
-       box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
-     }
-     
-     .edit-button a {
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       text-decoration: none;
-       color: inherit;
-     }
-     
-     .edit-button i {
-       font-size: 24px;
-       margin-right: 10px;
-     }
-     
-     .edit-button span {
-       font-size: 14px;
-       text-transform: uppercase;
-       letter-spacing: 1px;
-     }
-     
-     
-                 </style>
-        <a href=#>
-          <i class="fa fa-pencil"></i>
-          <span>Edit</span>
-        </a>
-      </div>
-      <style>
-        #modal-container {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal {
-  background-color: white;
-  margin: 10% auto;
-  padding: 20px;
-  border-radius: 5px;
-  width: 50%;
-  max-width: 600px;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-header h4 {
-  margin: 0;
-}
-
-.modal-header button {
-  background-color: transparent;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.modal-body input {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 5px;
-  border-radius: 3px;
-  border: 1px solid #ccc;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
-
-.modal-footer button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 5px 15px;
-  border-radius: 3px;
-  border: none;
-  margin-left: 10px;
-  cursor: pointer;
-}
-
-.modal-footer button:hover {
-  background-color: #3e8e41;
-}
-
-.modal-footer button:first-child {
-  background-color: #f44336;
-}
-
-.modal-footer button:first-child:hover {
-  background-color: #da190b;
-}
-
-      </style>
       
-      
-      <div id="modal-container">
-        <div class="modal">
-          <div class="modal-header">
-            <h4>Edit Details</h4>
-            <button id="close-modal">X</button>
-          </div>
-          <div class="modal-body">
-            <form onsubmit="return validateForm()" action="{% url 'update_account' %}" method="POST" >
-				{% include 'alert.html' %}   
-
-              {% csrf_token %}
-              <label for="name">Name:</label>
-              <input type="text" id="username" name="username" onkeyup='nameValidation(this)' value="{{ user.username }}"><br><br>
-              <label for="email">Email:</label>
-              <input type="email" id="email" name="email" onkeyup='emailValidation(this)' value="{{ user.email }}"><br><br>
-              <label for="phone">Phone:</label>
-              <input type="tel" id="phone" name="phone" onkeyup='phoneValidation(this)' value="{{ user.phone }}"><br><br>
-          
-                
-          </div>
-          <div class="modal-footer">
-            <button id="save-details">Save</button>
-            <button id="cancel-edit">Cancel</button>
-          </div>
-
-        </div>
-      </div>
-      <script>
-       function validateForm() {
-  var name = document.getElementById("username").value;
-  var email = document.getElementById("email").value;
-  var phone = document.getElementById("phone").value;
-
-  // Check that name is at least 2 characters
-  if (name.length < 2) {
-    alert("Name must be at least 2 characters");
-    return false;
-  }
-  if (!/^[a-zA-Z]+$/.test(name)) {
-  alert("Name can contain only alphabets");
-  return false;
-}
-
-  // Check that email contains @ and .
-  if (!/\S+@\S+\.\S+/.test(email)) {
-    alert("Email must be a valid email address");
-    return false;
-  }
-
-  // Check that phone is 10 digits and not all 0s
-  if (!/^[1-9]{1}[0-9]{9}$/.test(phone)) {
-    alert("Phone must be a valid 10-digit number");
-    return false;
-  }
-
-  return true;
-}
-
-
-			
-      </script>
-    </form>
-      
-            <script>
-                const editButton = document.querySelector('.edit-button');
-const modalContainer = document.querySelector('#modal-container');
-const closeModalButton = document.querySelector('#close-modal');
-const cancelEditButton = document.querySelector('#cancel-edit');
-
-editButton.addEventListener('click', () => {
-  modalContainer.style.display = 'block';
-});
-
-closeModalButton.addEventListener('click', () => {
-  modalContainer.style.display = 'none';
-});
-
-cancelEditButton.addEventListener('click', () => {
-  modalContainer.style.display = 'none';
-});
-
-            </script>
-              
-      
-    </div>
-  </div>
-  <script>
-            $(function() {
-        $('.toggle-btn').click(function() {
-            $('.filter-btn').toggleClass('open');
-
-        });
-
-        $('.filter-btn a').click(function() {
-            $('.filter-btn').removeClass('open');
-
-        });
-
-        });
-
-        $('#all').click(function() {
-
-        $('ul.tasks li').slideDown(300);
-
-        });
-
-        $('#one').click(function() {
-        $('.tasks li:not(.one)').slideUp(300, function() {
-            $('.one').slideDown(300);
-
-        });
-        });
-
-        $('#two').click(function() {
-        $('.tasks li:not(.two)').slideUp(300, function() {
-            $('.two').slideDown(300);
-
-        });
-        });
-        $('#three').click(function() {
-        $('.tasks li:not(.three)').slideUp(300, function() {
-            $('.three').slideDown(300);
-
-        });
-        });
-  </script>
+     
   {% endblock %}
